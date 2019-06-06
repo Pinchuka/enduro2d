@@ -145,48 +145,56 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, T>
     ceil(T v) noexcept {
         return v;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, T>
     floor(T v) noexcept {
         return v;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, T>
     round(T v) noexcept {
         return v;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, T>
     trunc(T v) noexcept {
         return v;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     ceil(T v) noexcept {
         return std::ceil(v);
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     floor(T v) noexcept {
         return std::floor(v);
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     round(T v) noexcept {
         return std::round(v);
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     trunc(T v) noexcept {
         return std::trunc(v);
@@ -260,6 +268,7 @@ namespace e2d::math
     }
 
     template < typename To, typename From >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_arithmetic_v<From> && std::is_arithmetic_v<To>,
         To>
@@ -273,18 +282,21 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, T>
     default_precision() noexcept {
         return 0;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_same_v<T, f32>, T>
     default_precision() noexcept {
         return 0.00001f;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_same_v<T, f64>, T>
     default_precision() noexcept {
         return 0.0000001;
@@ -295,6 +307,7 @@ namespace e2d::math
     //
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -313,6 +326,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -331,6 +345,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -349,6 +364,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -358,6 +374,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -367,6 +384,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -380,6 +398,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -393,6 +412,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -406,6 +426,7 @@ namespace e2d::math
     }
 
     template < typename T, typename U >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -423,18 +444,21 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_unsigned_v<T>, bool>
     is_power_of_2(T v) noexcept {
         return v && !(v & (v - 1));
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_unsigned_v<T>, T>
     max_power_of_2() noexcept {
         return T(1) << (sizeof(T) * 8 - 1);
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_unsigned_v<T>, T>
     next_power_of_2(T v) noexcept {
         E2D_ASSERT(v <= max_power_of_2<T>());
@@ -455,6 +479,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, bool>
     is_finite(T v) noexcept {
         E2D_UNUSED(v);
@@ -462,6 +487,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, bool>
     is_finite(T v) noexcept {
         return std::isfinite(v);
@@ -472,6 +498,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_signed_v<T>,
         T>
@@ -481,6 +508,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_unsigned_v<T>,
         T>
@@ -489,12 +517,14 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     abs(T v) noexcept {
         return std::abs(v);
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_signed_v<T>,
         std::make_unsigned_t<T>>
@@ -505,6 +535,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_unsigned_v<T>,
         T>
@@ -517,6 +548,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_integral_v<T>, T>
     mod(T x, T y) noexcept {
         E2D_ASSERT(y != T(0));
@@ -524,6 +556,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     mod(T x, T y) noexcept {
         E2D_ASSERT(y != T(0));
@@ -531,31 +564,34 @@ namespace e2d::math
     }
 
     //
-    // sign
+    // signbit
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_signed_v<T>,
         bool>
-    sign(T v) noexcept {
+    signbit(T v) noexcept {
         return v < 0;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_unsigned_v<T>,
         bool>
-    sign(T v) noexcept {
+    signbit(T v) noexcept {
         E2D_UNUSED(v);
         return false;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_floating_point_v<T>,
         bool>
-    sign(T v) noexcept {
+    signbit(T v) noexcept {
         return std::signbit(v);
     }
 
@@ -564,6 +600,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     sqrt(T v) noexcept {
         return std::sqrt(v);
@@ -574,18 +611,21 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     min(T l, T r) noexcept {
         return l < r ? l : r;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     max(T l, T r) noexcept {
         return l < r ? r : l;
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, std::pair<T,T>>
     minmax(T l, T r) noexcept {
         return l < r
@@ -598,6 +638,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     clamp(T v, T vmin, T vmax) noexcept {
         std::tie(vmin, vmax) = minmax(vmin, vmax);
@@ -605,6 +646,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     saturate(T v) noexcept {
         return clamp(v, T(0), T(1));
@@ -643,6 +685,7 @@ namespace e2d::math
     using make_distance_t = typename make_distance<T>::type;
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_integral_v<T> && std::is_signed_v<T>,
         make_distance_t<T>>
@@ -654,6 +697,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<
         std::is_unsigned_v<T> || std::is_floating_point_v<T>,
         make_distance_t<T>>
@@ -667,6 +711,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, bool>
     approximately(T l, T r, T precision = default_precision<T>()) noexcept {
         return distance(l, r) <= numeric_cast<make_distance_t<T>>(abs(precision));
@@ -677,6 +722,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_arithmetic_v<T>, bool>
     is_near_zero(T v, T precision = default_precision<T>()) noexcept {
         return approximately(v, T(0), precision);
@@ -687,11 +733,13 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     T lerp(T l, T r, T v) noexcept {
         return l + (r - l) * v;
     }
 
     template < typename T >
+    [[nodiscard]]
     T inverse_lerp(T l, T r, T v) noexcept {
         E2D_ASSERT(!approximately(l, r, T(0)));
         return (v - l) / (r - l);

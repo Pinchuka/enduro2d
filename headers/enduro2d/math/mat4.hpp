@@ -33,22 +33,22 @@ namespace e2d
             {0, 0, 1, 0},
             {0, 0, 0, 1}};
     public:
-        static const mat4& zero() noexcept;
-        static const mat4& identity() noexcept;
+        static constexpr mat4 zero() noexcept;
+        static constexpr mat4 identity() noexcept;
     public:
-        mat4() noexcept = default;
-        mat4(const mat4& other) noexcept = default;
+        constexpr mat4() noexcept = default;
+        constexpr mat4(const mat4& other) noexcept = default;
         mat4& operator=(const mat4& other) noexcept = default;
 
-        mat4(const vec4<T>& row0,
-             const vec4<T>& row1,
-             const vec4<T>& row2,
-             const vec4<T>& row3) noexcept;
+        constexpr mat4(const vec4<T>& row0,
+                       const vec4<T>& row1,
+                       const vec4<T>& row2,
+                       const vec4<T>& row3) noexcept;
 
-        mat4(T m11, T m12, T m13, T m14,
-             T m21, T m22, T m23, T m24,
-             T m31, T m32, T m33, T m34,
-             T m41, T m42, T m43, T m44) noexcept;
+        constexpr mat4(T m11, T m12, T m13, T m14,
+                       T m21, T m22, T m23, T m24,
+                       T m31, T m32, T m33, T m34,
+                       T m41, T m42, T m43, T m44) noexcept;
 
         template < typename To >
         mat4<To> cast_to() const noexcept;
@@ -70,27 +70,27 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const mat4<T>& mat4<T>::zero() noexcept {
-        static const mat4<T> zero{
+    [[nodiscard]]
+    constexpr mat4<T> mat4<T>::zero() noexcept {
+        return mat4<T>{
             0, 0, 0, 0,
             0, 0, 0, 0,
             0, 0, 0, 0,
             0, 0, 0, 0};
-        return zero;
     }
 
     template < typename T >
-    const mat4<T>& mat4<T>::identity() noexcept {
-        static const mat4<T> identity{
+    [[nodiscard]]
+    constexpr mat4<T> mat4<T>::identity() noexcept {
+        return mat4<T>{
             1, 0, 0, 0,
             0, 1, 0, 0,
             0, 0, 1, 0,
             0, 0, 0, 1};
-        return identity;
     }
 
     template < typename T >
-    mat4<T>::mat4(
+    constexpr mat4<T>::mat4(
         const vec4<T>& row0,
         const vec4<T>& row1,
         const vec4<T>& row2,
@@ -98,7 +98,7 @@ namespace e2d
     : rows{row0, row1, row2, row3} {}
 
     template < typename T >
-    mat4<T>::mat4(
+    constexpr mat4<T>::mat4(
         T m11, T m12, T m13, T m14,
         T m21, T m22, T m23, T m24,
         T m31, T m32, T m33, T m34,
@@ -110,6 +110,7 @@ namespace e2d
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     mat4<To> mat4<T>::cast_to() const noexcept {
         return {
             rows[0].template cast_to<To>(),
@@ -119,22 +120,26 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     T* mat4<T>::data() noexcept {
         return rows[0].data();
     }
 
     template < typename T >
+    [[nodiscard]]
     const T* mat4<T>::data() const noexcept {
         return rows[0].data();
     }
 
     template < typename T >
+    [[nodiscard]]
     vec4<T>& mat4<T>::operator[](std::size_t row) noexcept {
         E2D_ASSERT(row < 4);
         return rows[row];
     }
 
     template < typename T >
+    [[nodiscard]]
     const vec4<T>& mat4<T>::operator[](std::size_t row) const noexcept {
         E2D_ASSERT(row < 4);
         return rows[row];
@@ -168,6 +173,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_mat4(
         const vec4<T>& row0,
         const vec4<T>& row1,
@@ -178,6 +184,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_mat4(
         T m11, T m12, T m13, T m14,
         T m21, T m22, T m23, T m24,
@@ -196,6 +203,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const mat4<T>& l, const mat4<T>& r) noexcept {
         return
             l.rows[0] == r.rows[0] &&
@@ -205,6 +213,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const mat4<T>& l, const mat4<T>& r) noexcept {
         return !(l == r);
     }
@@ -214,6 +223,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator-(const mat4<T>& m) noexcept {
         return {
             -m.rows[0],
@@ -227,6 +237,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator+(const mat4<T>& l, T v) noexcept {
         return {
             l.rows[0] + v,
@@ -236,6 +247,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator*(const mat4<T>& l, T v) noexcept {
         return {
             l.rows[0] * v,
@@ -249,6 +261,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator+(T v, const mat4<T>& r) noexcept {
         return {
             v + r.rows[0],
@@ -258,6 +271,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator*(T v, const mat4<T>& r) noexcept {
         return {
             v * r.rows[0],
@@ -271,6 +285,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator+(const mat4<T>& l, const mat4<T>& r) noexcept {
         return {
             l.rows[0] + r.rows[0],
@@ -280,6 +295,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> operator*(const mat4<T>& l, const mat4<T>& r) noexcept {
         const T* const lm = l.data();
         const T* const rm = r.data();
@@ -310,6 +326,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     vec4<T> operator*(const vec4<T>& l, const mat4<T>& r) noexcept {
         const T* const rm = r.data();
         return {
@@ -327,6 +344,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_scale_matrix4(T x, T y, T z = T(1)) noexcept {
         return {
             x, 0, 0, 0,
@@ -336,6 +354,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_scale_matrix4(const vec4<T>& xyz) noexcept {
         return make_scale_matrix4(
             xyz.x,
@@ -344,6 +363,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_scale_matrix4(const vec3<T>& xyz) noexcept {
         return make_scale_matrix4(
             xyz.x,
@@ -352,6 +372,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_scale_matrix4(const vec2<T>& xy, T z = T(1)) noexcept {
         return make_scale_matrix4(
             xy.x,
@@ -364,6 +385,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_translation_matrix4(T x, T y, T z = T(0)) noexcept {
         return {
             1, 0, 0, 0,
@@ -373,6 +395,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_translation_matrix4(const vec4<T>& xyz) noexcept {
         return make_translation_matrix4(
             xyz.x,
@@ -381,6 +404,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_translation_matrix4(const vec3<T>& xyz) noexcept {
         return make_translation_matrix4(
             xyz.x,
@@ -389,6 +413,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_translation_matrix4(const vec2<T>& xy, T z = T(0)) noexcept {
         return make_translation_matrix4(
             xy.x,
@@ -401,6 +426,7 @@ namespace e2d::math
     //
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_rotation_matrix4(
         const unit<T, AngleTag>& angle,
@@ -431,6 +457,7 @@ namespace e2d::math
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     mat4<T> make_rotation_matrix4(
         const unit<T, AngleTag>& angle,
         const vec4<T>& axis_xyz) noexcept
@@ -443,6 +470,7 @@ namespace e2d::math
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     mat4<T> make_rotation_matrix4(
         const unit<T, AngleTag>& angle,
         const vec3<T>& axis_xyz) noexcept
@@ -455,6 +483,7 @@ namespace e2d::math
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     mat4<T> make_rotation_matrix4(
         const unit<T, AngleTag>& angle,
         const vec2<T>& axis_xy,
@@ -468,6 +497,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_rotation_matrix4(const quat<T>& q) noexcept {
         const T x = q.x;
         const T y = q.y;
@@ -498,6 +528,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_trs_matrix4(const trs2<T>& trs) noexcept {
         return make_scale_matrix4(trs.scale)
              * make_rotation_matrix4(trs.rotation, v4f::unit_z())
@@ -505,6 +536,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> make_trs_matrix4(const trs3<T>& trs) noexcept {
         return make_scale_matrix4(trs.scale)
              * make_rotation_matrix4(trs.rotation)
@@ -516,6 +548,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_loot_at_lh_matrix4(const vec3<T>& eye, const vec3<T>& at, const vec3<T>& up) noexcept {
         const vec3<T> az = normalized(at - eye);
@@ -536,6 +569,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_loot_at_rh_matrix4(const vec3<T>& eye, const vec3<T>& at, const vec3<T>& up) noexcept {
         const vec3<T> az = normalized(eye - at);
@@ -556,6 +590,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_orthogonal_lh_matrix4(T width, T height, T znear, T zfar) noexcept {
         E2D_ASSERT(!math::is_near_zero(width, T(0)));
@@ -573,6 +608,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_orthogonal_lh_matrix4(const vec2<T>& size, T znear, T zfar) {
         return make_orthogonal_lh_matrix4(size.x, size.y, znear, zfar);
@@ -583,6 +619,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_orthogonal_rh_matrix4(T width, T height, T znear, T zfar) noexcept {
         E2D_ASSERT(!math::is_near_zero(width, T(0)));
@@ -600,6 +637,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_orthogonal_rh_matrix4(const vec2<T>& size, T znear, T zfar) {
         return make_orthogonal_rh_matrix4(size.x, size.y, znear, zfar);
@@ -610,6 +648,7 @@ namespace e2d::math
     //
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_perspective_lh_matrix4(const unit<T, AngleTag>& fov, T aspect, T znear, T zfar) noexcept {
         E2D_ASSERT(!math::is_near_zero(aspect, T(0)));
@@ -631,6 +670,7 @@ namespace e2d::math
     //
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat4<T>>
     make_perspective_rh_matrix4(const unit<T, AngleTag>& fov, T aspect, T znear, T zfar) noexcept {
         E2D_ASSERT(!math::is_near_zero(aspect, T(0)));
@@ -652,6 +692,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, std::pair<mat4<T>, bool>>
     inversed(
         const mat4<T>& m,
@@ -725,6 +766,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     mat4<T> transposed(const mat4<T>& m) noexcept {
         const T* const mm = m.data();
         return {

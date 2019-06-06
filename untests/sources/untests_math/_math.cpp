@@ -414,22 +414,22 @@ TEST_CASE("math") {
         REQUIRE(math::approximately(math::mod(-6.0, -7.0), -6.0));
     }
     {
-        REQUIRE_FALSE(math::sign(0));
-        REQUIRE_FALSE(math::sign(1));
-        REQUIRE(math::sign(-1));
+        REQUIRE_FALSE(math::signbit(0));
+        REQUIRE_FALSE(math::signbit(1));
+        REQUIRE(math::signbit(-1));
 
-        REQUIRE_FALSE(math::sign(0u));
-        REQUIRE_FALSE(math::sign(1u));
+        REQUIRE_FALSE(math::signbit(0u));
+        REQUIRE_FALSE(math::signbit(1u));
 
-        REQUIRE_FALSE(math::sign(0.f));
-        REQUIRE_FALSE(math::sign(0.1f));
-        REQUIRE(math::sign(-0.f));
-        REQUIRE(math::sign(-0.1f));
+        REQUIRE_FALSE(math::signbit(0.f));
+        REQUIRE_FALSE(math::signbit(0.1f));
+        REQUIRE(math::signbit(-0.f));
+        REQUIRE(math::signbit(-0.1f));
 
-        REQUIRE_FALSE(math::sign(0.0));
-        REQUIRE_FALSE(math::sign(0.1));
-        REQUIRE(math::sign(-0.0));
-        REQUIRE(math::sign(-0.1));
+        REQUIRE_FALSE(math::signbit(0.0));
+        REQUIRE_FALSE(math::signbit(0.1));
+        REQUIRE(math::signbit(-0.0));
+        REQUIRE(math::signbit(-0.1));
     }
     {
         REQUIRE(math::approximately(math::ceil(1), 1));

@@ -23,18 +23,18 @@ namespace e2d
         vec2<T> position;
         vec2<T> size;
     public:
-        static const rect& zero() noexcept;
-        static const rect& unit() noexcept;
+        static constexpr rect zero() noexcept;
+        static constexpr rect unit() noexcept;
     public:
-        rect() noexcept = default;
-        rect(const rect& other) noexcept = default;
+        constexpr rect() noexcept = default;
+        constexpr rect(const rect& other) noexcept = default;
         rect& operator=(const rect& other) noexcept = default;
 
-        rect(T w, T h) noexcept;
-        rect(T x, T y, T w, T h) noexcept;
+        constexpr rect(T w, T h) noexcept;
+        constexpr rect(T x, T y, T w, T h) noexcept;
 
-        rect(const vec2<T>& nsize) noexcept;
-        rect(const vec2<T>& nposition, const vec2<T>& nsize) noexcept;
+        constexpr rect(const vec2<T>& nsize) noexcept;
+        constexpr rect(const vec2<T>& nposition, const vec2<T>& nsize) noexcept;
 
         template < typename To >
         rect<To> cast_to() const noexcept;
@@ -60,37 +60,38 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const rect<T>& rect<T>::zero() noexcept {
-        static const rect<T> zero{0, 0, 0, 0};
-        return zero;
+    [[nodiscard]]
+    constexpr rect<T> rect<T>::zero() noexcept {
+        return rect<T>{0, 0, 0, 0};
     }
 
     template < typename T >
-    const rect<T>& rect<T>::unit() noexcept {
-        static const rect<T> unit{0, 0, 1, 1};
-        return unit;
+    [[nodiscard]]
+    constexpr rect<T> rect<T>::unit() noexcept {
+        return rect<T>{0, 0, 1, 1};
     }
 
     template < typename T >
-    rect<T>::rect(T w, T h) noexcept
+    constexpr rect<T>::rect(T w, T h) noexcept
     : size(w, h) {}
 
     template < typename T >
-    rect<T>::rect(T x, T y, T w, T h) noexcept
+    constexpr rect<T>::rect(T x, T y, T w, T h) noexcept
     : position(x, y)
     , size(w, h) {}
 
     template < typename T >
-    rect<T>::rect(const vec2<T>& nsize) noexcept
+    constexpr rect<T>::rect(const vec2<T>& nsize) noexcept
     : size(nsize) {}
 
     template < typename T >
-    rect<T>::rect(const vec2<T>& nposition, const vec2<T>& nsize) noexcept
+    constexpr rect<T>::rect(const vec2<T>& nposition, const vec2<T>& nsize) noexcept
     : position(nposition)
     , size(nsize) {}
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     rect<To> rect<T>::cast_to() const noexcept {
         return {
             position.template cast_to<To>(),
@@ -98,22 +99,26 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     T* rect<T>::data() noexcept {
         return position.data();
     }
 
     template < typename T >
+    [[nodiscard]]
     const T* rect<T>::data() const noexcept {
         return position.data();
     }
 
     template < typename T >
+    [[nodiscard]]
     T& rect<T>::operator[](std::size_t index) noexcept {
         E2D_ASSERT(index < 4);
         return data()[index];
     }
 
     template < typename T >
+    [[nodiscard]]
     T rect<T>::operator[](std::size_t index) const noexcept {
         E2D_ASSERT(index < 4);
         return data()[index];
@@ -175,21 +180,25 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_rect(T w, T h) noexcept {
         return {w, h};
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_rect(T x, T y, T w, T h) noexcept {
         return {x, y, w, h};
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_rect(const vec2<T>& size) noexcept {
         return {size};
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_rect(const vec2<T>& position, const vec2<T>& size) noexcept {
         return {position, size};
     }
@@ -199,12 +208,14 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const rect<T>& l, const rect<T>& r) noexcept {
         return l.position == r.position
             && l.size == r.size;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const rect<T>& l, const rect<T>& r) noexcept {
         return !(l == r);
     }
@@ -214,21 +225,25 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator<(const rect<T>& l, const rect<T>& r) noexcept {
         return l.size.x * l.size.y < r.size.x * r.size.y;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator>(const rect<T>& l, const rect<T>& r) noexcept {
         return r < l;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator<=(const rect<T>& l, const rect<T>& r) noexcept {
         return !(r < l);
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator>=(const rect<T>& l, const rect<T>& r) noexcept {
         return !(l < r);
     }
@@ -238,6 +253,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator+(const rect<T>& l, T v) noexcept {
         return {
             l.position + v,
@@ -245,6 +261,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator-(const rect<T>& l, T v) noexcept {
         return {
             l.position - v,
@@ -252,6 +269,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator*(const rect<T>& l, T v) noexcept {
         return {
             l.position,
@@ -259,6 +277,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator/(const rect<T>& l, T v) noexcept {
         return {
             l.position,
@@ -270,6 +289,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator+(const rect<T>& l, const vec2<T>& v) noexcept {
         return {
             l.position + v,
@@ -277,6 +297,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator-(const rect<T>& l, const vec2<T>& v) noexcept {
         return {
             l.position - v,
@@ -284,6 +305,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator*(const rect<T>& l, const vec2<T>& v) noexcept {
         return {
             l.position,
@@ -291,6 +313,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> operator/(const rect<T>& l, const vec2<T>& v) noexcept {
         return {
             l.position,
@@ -305,6 +328,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_minmax_rect(T x1, T y1, T x2, T y2) noexcept {
         std::tie(x1, x2) = math::minmax(x1, x2);
         std::tie(y1, y2) = math::minmax(y1, y2);
@@ -314,11 +338,13 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_minmax_rect(const vec2<T>& p1, const vec2<T>& p2) noexcept {
         return make_minmax_rect(p1.x, p1.y, p2.x, p2.y);
     }
 
     template < typename T >
+    [[nodiscard]]
     rect<T> make_minmax_rect(const rect<T>& r) noexcept {
         return make_minmax_rect(r.position, r.position + r.size);
     }
@@ -328,6 +354,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool approximately(
         const rect<T>& l,
         const rect<T>& r,
@@ -342,11 +369,13 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     vec2<T> minimum(const rect<T>& r) noexcept {
         return math::minimized(r.position, r.position + r.size);
     }
 
     template < typename T >
+    [[nodiscard]]
     vec2<T> maximum(const rect<T>& r) noexcept {
         return math::maximized(r.position, r.position + r.size);
     }
@@ -356,11 +385,13 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     T area(const rect<T>& r) noexcept {
         return r.size.x * r.size.y;
     }
 
     template < typename T >
+    [[nodiscard]]
     T abs_area(const rect<T>& r) noexcept {
         return math::abs(r.size.x * r.size.y);
     }
@@ -370,6 +401,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     rect<T> merged(const rect<T>& l, const rect<T>& r) noexcept {
         return make_minmax_rect(
             math::minimized(minimum(l), minimum(r)),
@@ -381,6 +413,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool inside(const rect<T>& r, const vec2<T>& p) noexcept {
         const vec2<T> min = minimum(r);
         const vec2<T> max = maximum(r);
@@ -393,6 +426,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool overlaps(const rect<T>& l, const rect<T>& r) noexcept {
         const vec2<T> min_l = minimum(l);
         const vec2<T> max_l = maximum(l);
@@ -407,6 +441,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     vec2<T> normalized_to_point(const rect<T>& r, const vec2<T>& p) noexcept {
         const vec2<T> min = minimum(r);
         const vec2<T> max = maximum(r);
@@ -414,6 +449,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     vec2<T> point_to_normalized(const rect<T>& r, const vec2<T>& p) noexcept {
         const vec2<T> min = minimum(r);
         const vec2<T> max = maximum(r);
@@ -425,6 +461,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool contains_nan(const rect<T>& r) noexcept {
         return math::contains_nan(r.position)
             || math::contains_nan(r.size);

@@ -26,17 +26,17 @@ namespace e2d
         rad<T> rotation = rad<T>(0);
         vec2<T> scale = vec2<T>::unit();
     public:
-        static const trs2& zero() noexcept;
-        static const trs2& identity() noexcept;
+        static constexpr trs2 zero() noexcept;
+        static constexpr trs2 identity() noexcept;
     public:
-        trs2() noexcept = default;
-        trs2(const trs2& other) noexcept = default;
+        constexpr trs2() noexcept = default;
+        constexpr trs2(const trs2& other) noexcept = default;
         trs2& operator=(const trs2& other) noexcept = default;
 
         template < typename AngleTag >
-        trs2(const vec2<T>& t,
-             const unit<T, AngleTag>& r,
-             const vec2<T>& s) noexcept;
+        constexpr trs2(const vec2<T>& t,
+                       const unit<T, AngleTag>& r,
+                       const vec2<T>& s) noexcept;
 
         template < typename To >
         trs2<To> cast_to() const noexcept;
@@ -46,26 +46,26 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const trs2<T>& trs2<T>::zero() noexcept {
-        static const trs2<T> zero{
+    [[nodiscard]]
+    constexpr trs2<T> trs2<T>::zero() noexcept {
+        return trs2<T>{
             vec2<T>::zero(),
             rad<T>(0),
             vec2<T>::zero()};
-        return zero;
     }
 
     template < typename T >
-    const trs2<T>& trs2<T>::identity() noexcept {
-        static const trs2<T> identity{
+    [[nodiscard]]
+    constexpr trs2<T> trs2<T>::identity() noexcept {
+        return trs2<T>{
             vec2<T>::zero(),
             rad<T>(0),
             vec2<T>::unit()};
-        return identity;
     }
 
     template < typename T >
     template < typename AngleTag >
-    trs2<T>::trs2(
+    constexpr trs2<T>::trs2(
         const vec2<T>& t,
         const unit<T, AngleTag>& r,
         const vec2<T>& s) noexcept
@@ -75,6 +75,7 @@ namespace e2d
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     trs2<To> trs2<T>::cast_to() const noexcept {
         return {
             translation.template cast_to<To>(),
@@ -90,6 +91,7 @@ namespace e2d
     //
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     trs2<T> make_trs2(
         const vec2<T>& t,
         const unit<T, AngleTag>& r,
@@ -103,6 +105,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const trs2<T>& l, const trs2<T>& r) noexcept {
         return l.translation == r.translation
             && l.rotation == r.rotation
@@ -110,6 +113,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const trs2<T>& l, const trs2<T>& r) noexcept {
         return !(l == r);
     }
@@ -118,21 +122,25 @@ namespace e2d
 namespace e2d::math
 {
     template < typename T >
+    [[nodiscard]]
     trs2<T> make_translation_trs2(const vec2<T>& t) noexcept {
         return trs2<T>(t, rad<T>(0), vec2<T>::unit());
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     trs2<T> make_rotation_trs2(const unit<T, AngleTag>& r) noexcept {
         return trs2<T>(vec2<T>::zero(), r, vec2<T>::unit());
     }
 
     template < typename T >
+    [[nodiscard]]
     trs2<T> make_scale_trs2(const vec2<T>& s) noexcept {
         return trs2<T>(vec2<T>::zero(), rad<T>(0), s);
     }
 
     template < typename T >
+    [[nodiscard]]
     bool approximately(
         const trs2<T>& l,
         const trs2<T>& r,
@@ -144,6 +152,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     bool contains_nan(const trs2<T>& v) noexcept {
         return contains_nan(v.translation)
             || contains_nan(v.rotation)

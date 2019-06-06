@@ -30,20 +30,20 @@ namespace e2d
             {0, 1, 0},
             {0, 0, 1}};
     public:
-        static const mat3& zero() noexcept;
-        static const mat3& identity() noexcept;
+        static constexpr mat3 zero() noexcept;
+        static constexpr mat3 identity() noexcept;
     public:
-        mat3() noexcept = default;
-        mat3(const mat3& other) noexcept = default;
+        constexpr mat3() noexcept = default;
+        constexpr mat3(const mat3& other) noexcept = default;
         mat3& operator=(const mat3& other) noexcept = default;
 
-        mat3(const vec3<T>& row0,
-             const vec3<T>& row1,
-             const vec3<T>& row2) noexcept;
+        constexpr mat3(const vec3<T>& row0,
+                       const vec3<T>& row1,
+                       const vec3<T>& row2) noexcept;
 
-        mat3(T m11, T m12, T m13,
-             T m21, T m22, T m23,
-             T m31, T m32, T m33) noexcept;
+        constexpr mat3(T m11, T m12, T m13,
+                       T m21, T m22, T m23,
+                       T m31, T m32, T m33) noexcept;
 
         template < typename To >
         mat3<To> cast_to() const noexcept;
@@ -65,32 +65,32 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const mat3<T>& mat3<T>::zero() noexcept {
-        static const mat3<T> zero{
+    [[nodiscard]]
+    constexpr mat3<T> mat3<T>::zero() noexcept {
+        return mat3<T>{
             0, 0, 0,
             0, 0, 0,
             0, 0, 0};
-        return zero;
     }
 
     template < typename T >
-    const mat3<T>& mat3<T>::identity() noexcept {
-        static const mat3<T> identity{
+    [[nodiscard]]
+    constexpr mat3<T> mat3<T>::identity() noexcept {
+        return mat3<T>{
             1, 0, 0,
             0, 1, 0,
             0, 0, 1};
-        return identity;
     }
 
     template < typename T >
-    mat3<T>::mat3(
+    constexpr mat3<T>::mat3(
         const vec3<T>& row0,
         const vec3<T>& row1,
         const vec3<T>& row2) noexcept
     : rows{row0, row1, row2} {}
 
     template < typename T >
-    mat3<T>::mat3(
+    constexpr mat3<T>::mat3(
         T m11, T m12, T m13,
         T m21, T m22, T m23,
         T m31, T m32, T m33) noexcept
@@ -100,6 +100,7 @@ namespace e2d
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     mat3<To> mat3<T>::cast_to() const noexcept {
         return {
             rows[0].template cast_to<To>(),
@@ -108,22 +109,26 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     T* mat3<T>::data() noexcept {
         return rows[0].data();
     }
 
     template < typename T >
+    [[nodiscard]]
     const T* mat3<T>::data() const noexcept {
         return rows[0].data();
     }
 
     template < typename T >
+    [[nodiscard]]
     vec3<T>& mat3<T>::operator[](std::size_t row) noexcept {
         E2D_ASSERT(row < 3);
         return rows[row];
     }
 
     template < typename T >
+    [[nodiscard]]
     const vec3<T>& mat3<T>::operator[](std::size_t row) const noexcept {
         E2D_ASSERT(row < 3);
         return rows[row];
@@ -157,6 +162,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_mat3(
         const vec3<T>& row0,
         const vec3<T>& row1,
@@ -166,6 +172,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_mat3(
         T m11, T m12, T m13,
         T m21, T m22, T m23,
@@ -182,6 +189,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const mat3<T>& l, const mat3<T>& r) noexcept {
         return
             l.rows[0] == r.rows[0] &&
@@ -190,6 +198,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const mat3<T>& l, const mat3<T>& r) noexcept {
         return !(l == r);
     }
@@ -199,6 +208,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator-(const mat3<T>& m) noexcept {
         return {
             -m.rows[0],
@@ -211,6 +221,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator+(const mat3<T>& l, T v) noexcept {
         return {
             l.rows[0] + v,
@@ -219,6 +230,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator*(const mat3<T>& l, T v) noexcept {
         return {
             l.rows[0] * v,
@@ -231,6 +243,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator+(T v, const mat3<T>& r) noexcept {
         return {
             v + r.rows[0],
@@ -239,6 +252,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator*(T v, const mat3<T>& r) noexcept {
         return {
             v * r.rows[0],
@@ -251,6 +265,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator+(const mat3<T>& l, const mat3<T>& r) noexcept {
         return {
             l.rows[0] + r.rows[0],
@@ -259,6 +274,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> operator*(const mat3<T>& l, const mat3<T>& r) noexcept {
         const T* const lm = l.data();
         const T* const rm = r.data();
@@ -281,6 +297,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     vec3<T> operator*(const vec3<T>& l, const mat3<T>& r) noexcept {
         const T* const rm = r.data();
         return {
@@ -297,6 +314,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_scale_matrix3(T x, T y, T z = T(1)) noexcept {
         return {
             x, 0, 0,
@@ -305,6 +323,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_scale_matrix3(const vec4<T>& xyz) noexcept {
         return make_scale_matrix3(
             xyz.x,
@@ -313,6 +332,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_scale_matrix3(const vec3<T>& xyz) noexcept {
         return make_scale_matrix3(
             xyz.x,
@@ -321,6 +341,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_scale_matrix3(const vec2<T>& xy, T z = T(1)) noexcept {
         return make_scale_matrix3(
             xy.x,
@@ -333,6 +354,7 @@ namespace e2d::math
     //
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, mat3<T>>
     make_rotation_matrix3(
         const unit<T, AngleTag>& angle,
@@ -362,6 +384,7 @@ namespace e2d::math
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     mat3<T> make_rotation_matrix3(
         const unit<T, AngleTag>& angle,
         const vec4<T>& axis_xyz) noexcept
@@ -374,6 +397,7 @@ namespace e2d::math
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     mat3<T> make_rotation_matrix3(
         const unit<T, AngleTag>& angle,
         const vec3<T>& axis_xyz) noexcept
@@ -386,6 +410,7 @@ namespace e2d::math
     }
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     mat3<T> make_rotation_matrix3(
         const unit<T, AngleTag>& angle,
         const vec2<T>& axis_xy,
@@ -399,6 +424,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> make_rotation_matrix3(const quat<T>& q) noexcept {
         const T x = q.x;
         const T y = q.y;
@@ -428,6 +454,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, std::pair<mat3<T>, bool>>
     inversed(
         const mat3<T>& m,
@@ -470,6 +497,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     mat3<T> transposed(const mat3<T>& m) noexcept {
         const T* const mm = m.data();
         return {

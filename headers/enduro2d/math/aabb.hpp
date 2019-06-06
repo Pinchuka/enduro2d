@@ -23,18 +23,18 @@ namespace e2d
         vec3<T> position;
         vec3<T> size;
     public:
-        static const aabb& zero() noexcept;
-        static const aabb& unit() noexcept;
+        static constexpr aabb zero() noexcept;
+        static constexpr aabb unit() noexcept;
     public:
-        aabb() noexcept = default;
-        aabb(const aabb& other) noexcept = default;
+        constexpr aabb() noexcept = default;
+        constexpr aabb(const aabb& other) noexcept = default;
         aabb& operator=(const aabb& other) noexcept = default;
 
-        aabb(T w, T h, T l) noexcept;
-        aabb(T x, T y, T z, T w, T h, T l) noexcept;
+        constexpr aabb(T w, T h, T l) noexcept;
+        constexpr aabb(T x, T y, T z, T w, T h, T l) noexcept;
 
-        aabb(const vec3<T>& nsize) noexcept;
-        aabb(const vec3<T>& nposition, const vec3<T>& nsize) noexcept;
+        constexpr aabb(const vec3<T>& nsize) noexcept;
+        constexpr aabb(const vec3<T>& nposition, const vec3<T>& nsize) noexcept;
 
         template < typename To >
         aabb<To> cast_to() const noexcept;
@@ -60,37 +60,38 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const aabb<T>& aabb<T>::zero() noexcept {
-        static const aabb<T> zero{0, 0, 0, 0, 0, 0};
-        return zero;
+    [[nodiscard]]
+    constexpr aabb<T> aabb<T>::zero() noexcept {
+        return aabb<T>{0, 0, 0, 0, 0, 0};
     }
 
     template < typename T >
-    const aabb<T>& aabb<T>::unit() noexcept {
-        static const aabb<T> unit{0, 0, 0, 1, 1, 1};
-        return unit;
+    [[nodiscard]]
+    constexpr aabb<T> aabb<T>::unit() noexcept {
+        return aabb<T>{0, 0, 0, 1, 1, 1};
     }
 
     template < typename T >
-    aabb<T>::aabb(T w, T h, T l) noexcept
+    constexpr aabb<T>::aabb(T w, T h, T l) noexcept
     : size(w, h, l) {}
 
     template < typename T >
-    aabb<T>::aabb(T x, T y, T z, T w, T h, T l) noexcept
+    constexpr aabb<T>::aabb(T x, T y, T z, T w, T h, T l) noexcept
     : position(x, y, z)
     , size(w, h, l) {}
 
     template < typename T >
-    aabb<T>::aabb(const vec3<T>& nsize) noexcept
+    constexpr aabb<T>::aabb(const vec3<T>& nsize) noexcept
     : size(nsize) {}
 
     template < typename T >
-    aabb<T>::aabb(const vec3<T>& nposition, const vec3<T>& nsize) noexcept
+    constexpr aabb<T>::aabb(const vec3<T>& nposition, const vec3<T>& nsize) noexcept
     : position(nposition)
     , size(nsize) {}
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     aabb<To> aabb<T>::cast_to() const noexcept {
         return {
             position.template cast_to<To>(),
@@ -98,22 +99,26 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     T* aabb<T>::data() noexcept {
         return position.data();
     }
 
     template < typename T >
+    [[nodiscard]]
     const T* aabb<T>::data() const noexcept {
         return position.data();
     }
 
     template < typename T >
+    [[nodiscard]]
     T& aabb<T>::operator[](std::size_t index) noexcept {
         E2D_ASSERT(index < 6);
         return data()[index];
     }
 
     template < typename T >
+    [[nodiscard]]
     T aabb<T>::operator[](std::size_t index) const noexcept {
         E2D_ASSERT(index < 6);
         return data()[index];
@@ -175,21 +180,25 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_aabb(T w, T h, T l) noexcept {
         return {w, h, l};
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_aabb(T x, T y, T z, T w, T h, T l) noexcept {
         return {x, y, z, w, h, l};
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_aabb(const vec3<T>& size) noexcept {
         return {size};
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_aabb(const vec3<T>& position, const vec3<T>& size) noexcept {
         return {position, size};
     }
@@ -199,12 +208,14 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const aabb<T>& l, const aabb<T>& r) noexcept {
         return l.position == r.position
             && l.size == r.size;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const aabb<T>& l, const aabb<T>& r) noexcept {
         return !(l == r);
     }
@@ -214,21 +225,25 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator<(const aabb<T>& l, const aabb<T>& r) noexcept {
         return l.size.x * l.size.y * l.size.z < r.size.x * r.size.y * r.size.z;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator>(const aabb<T>& l, const aabb<T>& r) noexcept {
         return r < l;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator<=(const aabb<T>& l, const aabb<T>& r) noexcept {
         return !(r < l);
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator>=(const aabb<T>& l, const aabb<T>& r) noexcept {
         return !(l < r);
     }
@@ -238,6 +253,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator+(const aabb<T>& l, T v) noexcept {
         return {
             l.position + v,
@@ -245,6 +261,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator-(const aabb<T>& l, T v) noexcept {
         return {
             l.position - v,
@@ -252,6 +269,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator*(const aabb<T>& l, T v) noexcept {
         return {
             l.position,
@@ -259,6 +277,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator/(const aabb<T>& l, T v) noexcept {
         return {
             l.position,
@@ -270,6 +289,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator+(const aabb<T>& l, const vec3<T>& v) noexcept {
         return {
             l.position + v,
@@ -277,6 +297,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator-(const aabb<T>& l, const vec3<T>& v) noexcept {
         return {
             l.position - v,
@@ -284,6 +305,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator*(const aabb<T>& l, const vec3<T>& v) noexcept {
         return {
             l.position,
@@ -291,6 +313,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> operator/(const aabb<T>& l, const vec3<T>& v) noexcept {
         return {
             l.position,
@@ -305,6 +328,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_minmax_aabb(T x1, T y1, T z1, T x2, T y2, T z2) noexcept {
         std::tie(x1, x2) = math::minmax(x1, x2);
         std::tie(y1, y2) = math::minmax(y1, y2);
@@ -315,11 +339,13 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_minmax_aabb(const vec3<T>& p1, const vec3<T>& p2) noexcept {
         return make_minmax_aabb(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
     }
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> make_minmax_aabb(const aabb<T>& b) noexcept {
         return make_minmax_aabb(b.position, b.position + b.size);
     }
@@ -329,6 +355,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool approximately(
         const aabb<T>& l,
         const aabb<T>& r,
@@ -343,11 +370,13 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     vec3<T> minimum(const aabb<T>& b) noexcept {
         return math::minimized(b.position, b.position + b.size);
     }
 
     template < typename T >
+    [[nodiscard]]
     vec3<T> maximum(const aabb<T>& b) noexcept {
         return math::maximized(b.position, b.position + b.size);
     }
@@ -357,11 +386,13 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     T volume(const aabb<T>& b) noexcept {
         return b.size.x * b.size.y * b.size.z;
     }
 
     template < typename T >
+    [[nodiscard]]
     T abs_volume(const aabb<T>& b) noexcept {
         return math::abs(b.size.x * b.size.y * b.size.z);
     }
@@ -371,6 +402,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     aabb<T> merged(const aabb<T>& l, const aabb<T>& r) noexcept {
         return make_minmax_aabb(
             math::minimized(minimum(l), minimum(r)),
@@ -382,6 +414,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool inside(const aabb<T>& r, const vec3<T>& p) noexcept {
         const vec3<T> min = minimum(r);
         const vec3<T> max = maximum(r);
@@ -395,6 +428,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool overlaps(const aabb<T>& l, const aabb<T>& r) noexcept {
         const vec3<T> min_l = minimum(l);
         const vec3<T> max_l = maximum(l);
@@ -410,6 +444,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     vec3<T> normalized_to_point(const aabb<T>& r, const vec3<T>& p) noexcept {
         const vec3<T> min = minimum(r);
         const vec3<T> max = maximum(r);
@@ -417,6 +452,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     vec3<T> point_to_normalized(const aabb<T>& r, const vec3<T>& p) noexcept {
         const vec3<T> min = minimum(r);
         const vec3<T> max = maximum(r);
@@ -428,6 +464,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool contains_nan(const aabb<T>& r) noexcept {
         return math::contains_nan(r.position)
             || math::contains_nan(r.size);

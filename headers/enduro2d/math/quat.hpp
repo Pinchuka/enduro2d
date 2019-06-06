@@ -28,15 +28,15 @@ namespace e2d
         T z = 0;
         T w = 1;
     public:
-        static const quat& zero() noexcept;
-        static const quat& identity() noexcept;
+        static constexpr quat zero() noexcept;
+        static constexpr quat identity() noexcept;
     public:
-        quat() noexcept = default;
-        quat(const quat& other) noexcept = default;
+        constexpr quat() noexcept = default;
+        constexpr quat(const quat& other) noexcept = default;
         quat& operator=(const quat& other) noexcept = default;
 
-        quat(T x, T y, T z, T w) noexcept;
-        explicit quat(const vec4<T>& other) noexcept;
+        constexpr quat(T x, T y, T z, T w) noexcept;
+        constexpr explicit quat(const vec4<T>& other) noexcept;
 
         template < typename To >
         quat<To> cast_to() const noexcept;
@@ -58,26 +58,26 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const quat<T>& quat<T>::zero() noexcept {
-        static const quat<T> zero{0, 0, 0, 0};
-        return zero;
+    [[nodiscard]]
+    constexpr quat<T> quat<T>::zero() noexcept {
+        return quat<T>{0, 0, 0, 0};
     }
 
     template < typename T >
-    const quat<T>& quat<T>::identity() noexcept {
-        static const quat<T> identity{0, 0, 0, 1};
-        return identity;
+    [[nodiscard]]
+    constexpr quat<T> quat<T>::identity() noexcept {
+        return quat<T>{0, 0, 0, 1};
     }
 
     template < typename T >
-    quat<T>::quat(T nx, T ny, T nz, T nw) noexcept
+    constexpr quat<T>::quat(T nx, T ny, T nz, T nw) noexcept
     : x(nx)
     , y(ny)
     , z(nz)
     , w(nw) {}
 
     template < typename T >
-    quat<T>::quat(const vec4<T>& other) noexcept
+    constexpr quat<T>::quat(const vec4<T>& other) noexcept
     : x(other.x)
     , y(other.y)
     , z(other.z)
@@ -85,6 +85,7 @@ namespace e2d
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     quat<To> quat<T>::cast_to() const noexcept {
         return {
             math::numeric_cast<To>(x),
@@ -94,22 +95,26 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     T* quat<T>::data() noexcept {
         return &x;
     }
 
     template < typename T >
+    [[nodiscard]]
     const T* quat<T>::data() const noexcept {
         return &x;
     }
 
     template < typename T >
+    [[nodiscard]]
     T& quat<T>::operator[](std::size_t index) noexcept {
         E2D_ASSERT(index < 4);
         return data()[index];
     }
 
     template < typename T >
+    [[nodiscard]]
     T quat<T>::operator[](std::size_t index) const noexcept {
         E2D_ASSERT(index < 4);
         return data()[index];
@@ -143,11 +148,13 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     quat<T> make_quat(T x, T y, T z, T w) noexcept {
         return quat<T>(x, y, z, w);
     }
 
     template < typename T >
+    [[nodiscard]]
     quat<T> make_quat(const vec4<T>& other) noexcept {
         return quat<T>(other);
     }
@@ -157,6 +164,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const quat<T>& l, const quat<T>& r) noexcept {
         return
             math::approximately(l.x, r.x) &&
@@ -166,6 +174,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const quat<T>& l, const quat<T>& r) noexcept {
         return !(l == r);
     }
@@ -175,6 +184,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator<(const quat<T>& l, const quat<T>& r) noexcept {
         return
             (l.x < r.x) ||
@@ -184,16 +194,19 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator>(const quat<T>& l, const quat<T>& r) noexcept {
         return r < l;
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator<=(const quat<T>& l, const quat<T>& r) noexcept {
         return !(r < l);
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator>=(const quat<T>& l, const quat<T>& r) noexcept {
         return !(l < r);
     }
@@ -203,6 +216,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     quat<T> operator+(const quat<T>& l, T v) noexcept {
         return {
             l.x + v,
@@ -212,6 +226,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     quat<T> operator*(const quat<T>& l, T v) noexcept {
         return {
             l.x * v,
@@ -225,6 +240,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     quat<T> operator+(T v, const quat<T>& r) noexcept {
         return {
             v + r.x,
@@ -234,6 +250,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     quat<T> operator*(T v, const quat<T>& r) noexcept {
         return {
             v * r.x,
@@ -247,6 +264,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     quat<T> operator+(const quat<T>& l, const quat<T>& r) noexcept {
         return {
             l.x + r.x,
@@ -256,6 +274,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     quat<T> operator*(const quat<T>& l, const quat<T>& r) noexcept {
         return {
             (l.w * r.x) + (l.x * r.w) + (l.y * r.z) - (l.z * r.y),
@@ -269,6 +288,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     vec3<T> operator*(const vec3<T>& l, const quat<T>& r) noexcept {
         const vec3<T> qvec{r.x, r.y, r.z};
         auto uv = math::cross(qvec, l);
@@ -286,6 +306,7 @@ namespace e2d::math
     //
 
     template < typename T, typename AngleTag >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, quat<T>>
     make_quat_from_axis_angle(
         const unit<T, AngleTag>& angle,
@@ -309,6 +330,7 @@ namespace e2d::math
              , typename AngleTagR
              , typename AngleTagP
              , typename AngleTagY >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, quat<T>>
     make_quat_from_euler_angles(
         const unit<T, AngleTagR>& roll,
@@ -344,6 +366,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool approximately(
         const quat<T>& l,
         const quat<T>& r,
@@ -361,6 +384,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     T dot(const quat<T>& l, const quat<T>& r) noexcept {
         return
             l.x * r.x +
@@ -370,6 +394,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     T abs_dot(const quat<T>& l, const quat<T>& r) noexcept {
         return
             math::abs(l.x * r.x) +
@@ -383,11 +408,13 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     T length_squared(const quat<T>& v) noexcept {
         return dot(v, v);
     }
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, T>
     length(const quat<T>& v) noexcept {
         return math::sqrt(length_squared(v));
@@ -398,6 +425,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, quat<T>>
     normalized(
         const quat<T>& v,
@@ -416,6 +444,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     quat<T> lerp(const quat<T>& l, const quat<T>& r, T v) noexcept {
         return {
             math::lerp(l.x, r.x, v),
@@ -429,6 +458,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     std::enable_if_t<std::is_floating_point_v<T>, quat<T>>
     inversed(
         const quat<T>& q,
@@ -451,6 +481,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     quat<T> conjugated(const quat<T>& q) noexcept {
         return {
             -q.x,
@@ -464,6 +495,7 @@ namespace e2d::math
     //
 
     template < typename T >
+    [[nodiscard]]
     bool contains_nan(const quat<T>& v) noexcept {
         return
             !math::is_finite(v.x) ||

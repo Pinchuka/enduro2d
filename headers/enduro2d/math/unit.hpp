@@ -73,12 +73,14 @@ namespace e2d
 
     template < typename T, typename Tag >
     template < typename To >
+    [[nodiscard]]
     unit<To, Tag> unit<T, Tag>::cast_to() const noexcept {
         return unit<To, Tag>(math::numeric_cast<To>(value));
     }
 
     template < typename T, typename Tag >
     template < typename OtherTag >
+    [[nodiscard]]
     unit<T, OtherTag> unit<T, Tag>::convert_to() const noexcept {
         return unit_converter<Tag, OtherTag>()(*this);
     }
@@ -116,6 +118,7 @@ namespace e2d
     //
 
     template < typename Tag, typename T >
+    [[nodiscard]]
     unit<T, Tag> make_unit(T v) noexcept {
         return unit<T, Tag>(v);
     }
@@ -125,11 +128,13 @@ namespace e2d
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool operator==(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return math::approximately(l.value, r.value);
     }
 
     template < typename T, typename Tag  >
+    [[nodiscard]]
     bool operator!=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return !(l == r);
     }
@@ -139,21 +144,25 @@ namespace e2d
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool operator<(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value < r.value;
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool operator>(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value > r.value;
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool operator<=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value <= r.value;
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool operator>=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value >= r.value;
     }
@@ -163,6 +172,7 @@ namespace e2d
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator-(const unit<T, Tag>& u) noexcept {
         return {
             -u.value,
@@ -174,6 +184,7 @@ namespace e2d
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator*(const unit<T, Tag>& l, T v) noexcept {
         return {
             l.value * v,
@@ -181,6 +192,7 @@ namespace e2d
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator/(const unit<T, Tag>& l, T v) noexcept {
         E2D_ASSERT(!math::is_near_zero(v, T(0)));
         return {
@@ -193,6 +205,7 @@ namespace e2d
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator*(T v, const unit<T, Tag>& r) noexcept {
         return {
             v * r.value,
@@ -200,6 +213,7 @@ namespace e2d
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator/(T v, const unit<T, Tag>& r) noexcept {
         E2D_ASSERT(!math::approximately(r.value, T(0), T(0)));
         return {
@@ -212,6 +226,7 @@ namespace e2d
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator+(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return {
             l.value + r.value,
@@ -219,6 +234,7 @@ namespace e2d
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> operator-(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return {
             l.value - r.value,
@@ -233,6 +249,7 @@ namespace e2d::math
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool approximately(
         const unit<T, Tag>& l,
         const unit<T, Tag>& r,
@@ -246,6 +263,7 @@ namespace e2d::math
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> minimized(const unit<T, Tag>& u, const unit<T, Tag>& umin) noexcept {
         return {
             math::min(u.value, umin.value),
@@ -253,6 +271,7 @@ namespace e2d::math
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> maximized(const unit<T, Tag>& u, const unit<T, Tag>& umax) noexcept {
         return {
             math::max(u.value, umax.value),
@@ -260,6 +279,7 @@ namespace e2d::math
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> clamped(const unit<T, Tag>& u, const unit<T, Tag>& umin, const unit<T, Tag>& umax) noexcept {
         return {
             math::clamp(u.value, umin.value, umax.value),
@@ -267,6 +287,7 @@ namespace e2d::math
     }
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     unit<T, Tag> saturated(const unit<T, Tag>& u) noexcept {
         return clamped(u, {T(0), Tag{}}, {T(1), Tag{}});
     }
@@ -276,6 +297,7 @@ namespace e2d::math
     //
 
     template < typename T, typename Tag >
+    [[nodiscard]]
     bool contains_nan(const unit<T, Tag>& u) noexcept {
         return !math::is_finite(u.value);
     }

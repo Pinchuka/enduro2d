@@ -25,16 +25,16 @@ namespace e2d
         quat<T> rotation = quat<T>::identity();
         vec3<T> scale = vec3<T>::unit();
     public:
-        static const trs3& zero() noexcept;
-        static const trs3& identity() noexcept;
+        static constexpr trs3 zero() noexcept;
+        static constexpr trs3 identity() noexcept;
     public:
-        trs3() noexcept = default;
-        trs3(const trs3& other) noexcept = default;
+        constexpr trs3() noexcept = default;
+        constexpr trs3(const trs3& other) noexcept = default;
         trs3& operator=(const trs3& other) noexcept = default;
 
-        trs3(const vec3<T>& t,
-             const quat<T>& r,
-             const vec3<T>& s) noexcept;
+        constexpr trs3(const vec3<T>& t,
+                       const quat<T>& r,
+                       const vec3<T>& s) noexcept;
 
         template < typename To >
         trs3<To> cast_to() const noexcept;
@@ -44,25 +44,25 @@ namespace e2d
 namespace e2d
 {
     template < typename T >
-    const trs3<T>& trs3<T>::zero() noexcept {
-        static const trs3<T> zero{
+    [[nodiscard]]
+    constexpr trs3<T> trs3<T>::zero() noexcept {
+        return trs3<T>{
             vec3<T>::zero(),
             quat<T>::zero(),
             vec3<T>::zero()};
-        return zero;
     }
 
     template < typename T >
-    const trs3<T>& trs3<T>::identity() noexcept {
-        static const trs3<T> identity{
+    [[nodiscard]]
+    constexpr trs3<T> trs3<T>::identity() noexcept {
+        return trs3<T>{
             vec3<T>::zero(),
             quat<T>::identity(),
             vec3<T>::unit()};
-        return identity;
     }
 
     template < typename T >
-    trs3<T>::trs3(
+    constexpr trs3<T>::trs3(
         const vec3<T>& t,
         const quat<T>& r,
         const vec3<T>& s) noexcept
@@ -72,6 +72,7 @@ namespace e2d
 
     template < typename T >
     template < typename To >
+    [[nodiscard]]
     trs3<To> trs3<T>::cast_to() const noexcept {
         return {
             translation.template cast_to<To>(),
@@ -87,6 +88,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     trs3<T> make_trs3(
         const vec3<T>& t,
         const quat<T>& r,
@@ -100,6 +102,7 @@ namespace e2d
     //
 
     template < typename T >
+    [[nodiscard]]
     bool operator==(const trs3<T>& l, const trs3<T>& r) noexcept {
         return l.translation == r.translation
             && l.rotation == r.rotation
@@ -107,6 +110,7 @@ namespace e2d
     }
 
     template < typename T >
+    [[nodiscard]]
     bool operator!=(const trs3<T>& l, const trs3<T>& r) noexcept {
         return !(l == r);
     }
@@ -115,21 +119,25 @@ namespace e2d
 namespace e2d::math
 {
     template < typename T >
+    [[nodiscard]]
     trs3<T> make_translation_trs3(const vec3<T>& t) noexcept {
         return trs3<T>(t, quat<T>::identity(), vec3<T>::unit());
     }
 
     template < typename T >
+    [[nodiscard]]
     trs3<T> make_rotation_trs3(const quat<T>& r) noexcept {
         return trs3<T>(vec3<T>::zero(), r, vec3<T>::unit());
     }
 
     template < typename T >
+    [[nodiscard]]
     trs3<T> make_scale_trs3(const vec3<T>& s) noexcept {
         return trs3<T>(vec3<T>::zero(), quat<T>::identity(), s);
     }
 
     template < typename T >
+    [[nodiscard]]
     bool approximately(
         const trs3<T>& l,
         const trs3<T>& r,
@@ -141,6 +149,7 @@ namespace e2d::math
     }
 
     template < typename T >
+    [[nodiscard]]
     bool contains_nan(const trs3<T>& v) noexcept {
         return contains_nan(v.translation)
             || contains_nan(v.rotation)
