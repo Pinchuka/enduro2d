@@ -31,12 +31,12 @@ namespace e2d
         bool start(Args&&... args);
         bool start(application_uptr app);
 
-        f32 time() const noexcept;
-        f32 delta_time() const noexcept;
+        [[nodiscard]] f32 time() const noexcept;
+        [[nodiscard]] f32 delta_time() const noexcept;
 
-        u32 frame_rate() const noexcept;
-        u32 frame_count() const noexcept;
-        f32 realtime_time() const noexcept;
+        [[nodiscard]] u32 frame_rate() const noexcept;
+        [[nodiscard]] u32 frame_count() const noexcept;
+        [[nodiscard]] f32 realtime_time() const noexcept;
     private:
         class internal_state;
         std::unique_ptr<internal_state> state_;
@@ -65,9 +65,9 @@ namespace e2d
         debug_parameters& file_logging(bool value) noexcept;
         debug_parameters& console_logging(bool value) noexcept;
 
-        const str& log_filename() const noexcept;
-        bool file_logging() const noexcept;
-        bool console_logging() const noexcept;
+        [[nodiscard]] const str& log_filename() const noexcept;
+        [[nodiscard]] bool file_logging() const noexcept;
+        [[nodiscard]] bool console_logging() const noexcept;
     private:
         str log_filename_{"log.txt"};
         bool file_logging_{true};
@@ -85,10 +85,10 @@ namespace e2d
         window_parameters& vsync(bool value) noexcept;
         window_parameters& fullscreen(bool value) noexcept;
 
-        const str& caption() const noexcept;
-        const v2u& size() const noexcept;
-        bool vsync() const noexcept;
-        bool fullscreen() const noexcept;
+        [[nodiscard]] const str& caption() const noexcept;
+        [[nodiscard]] const v2u& size() const noexcept;
+        [[nodiscard]] bool vsync() const noexcept;
+        [[nodiscard]] bool fullscreen() const noexcept;
     private:
         str caption_{"Enduro2D"};
         v2u size_{640, 480};
@@ -105,8 +105,8 @@ namespace e2d
         timer_parameters& minimal_framerate(u32 value) noexcept;
         timer_parameters& maximal_framerate(u32 value) noexcept;
 
-        u32 minimal_framerate() const noexcept;
-        u32 maximal_framerate() const noexcept;
+        [[nodiscard]] u32 minimal_framerate() const noexcept;
+        [[nodiscard]] u32 maximal_framerate() const noexcept;
     private:
         u32 minimal_framerate_{30u};
         u32 maximal_framerate_{1000u};
@@ -128,19 +128,19 @@ namespace e2d
         parameters& window_params(const window_parameters& value);
         parameters& timer_params(const timer_parameters& value);
 
-        str& game_name() noexcept;
-        str& company_name() noexcept;
-        bool& without_graphics() noexcept;
-        debug_parameters& debug_params() noexcept;
-        window_parameters& window_params() noexcept;
-        timer_parameters& timer_params() noexcept;
+        [[nodiscard]] str& game_name() noexcept;
+        [[nodiscard]] str& company_name() noexcept;
+        [[nodiscard]] bool& without_graphics() noexcept;
+        [[nodiscard]] debug_parameters& debug_params() noexcept;
+        [[nodiscard]] window_parameters& window_params() noexcept;
+        [[nodiscard]] timer_parameters& timer_params() noexcept;
 
-        const str& game_name() const noexcept;
-        const str& company_name() const noexcept;
-        const bool& without_graphics() const noexcept;
-        const debug_parameters& debug_params() const noexcept;
-        const window_parameters& window_params() const noexcept;
-        const timer_parameters& timer_params() const noexcept;
+        [[nodiscard]] const str& game_name() const noexcept;
+        [[nodiscard]] const str& company_name() const noexcept;
+        [[nodiscard]] const bool& without_graphics() const noexcept;
+        [[nodiscard]] const debug_parameters& debug_params() const noexcept;
+        [[nodiscard]] const window_parameters& window_params() const noexcept;
+        [[nodiscard]] const timer_parameters& timer_params() const noexcept;
     private:
         str game_name_{"noname"};
         str company_name_{"noname"};

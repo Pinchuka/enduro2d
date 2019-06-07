@@ -31,10 +31,10 @@ namespace e2d
         class file_source : private e2d::noncopyable {
         public:
             virtual ~file_source() noexcept = default;
-            virtual bool valid() const noexcept = 0;
-            virtual bool exists(str_view path) const = 0;
-            virtual input_stream_uptr read(str_view path) const = 0;
-            virtual output_stream_uptr write(str_view path, bool append) const = 0;
+            [[nodiscard]] virtual bool valid() const noexcept = 0;
+            [[nodiscard]] virtual bool exists(str_view path) const = 0;
+            [[nodiscard]] virtual input_stream_uptr read(str_view path) const = 0;
+            [[nodiscard]] virtual output_stream_uptr write(str_view path, bool append) const = 0;
             virtual bool trace(str_view path, filesystem::trace_func func) const = 0;
         };
         using file_source_uptr = std::unique_ptr<file_source>;
@@ -47,16 +47,16 @@ namespace e2d
         bool register_scheme_alias(str_view scheme, url alias);
         bool unregister_scheme_alias(str_view scheme) noexcept;
 
-        bool exists(const url& url) const;
+        [[nodiscard]] bool exists(const url& url) const;
 
-        input_stream_uptr read(const url& url) const;
-        output_stream_uptr write(const url& url, bool append) const;
+        [[nodiscard]] input_stream_uptr read(const url& url) const;
+        [[nodiscard]] output_stream_uptr write(const url& url, bool append) const;
 
         bool load(const url& url, buffer& dst) const;
-        stdex::promise<buffer> load_async(const url& url) const;
+        [[nodiscard]] stdex::promise<buffer> load_async(const url& url) const;
 
         bool load_as_string(const url& url, str& dst) const;
-        stdex::promise<str> load_as_string_async(const url& url) const;
+        [[nodiscard]] stdex::promise<str> load_as_string_async(const url& url) const;
 
         template < typename Iter >
         bool extract(const url& url, Iter result_iter) const;

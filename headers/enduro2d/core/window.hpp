@@ -41,26 +41,26 @@ namespace e2d
         void restore() noexcept;
         void minimize() noexcept;
 
-        bool enabled() const noexcept;
-        bool visible() const noexcept;
-        bool focused() const noexcept;
-        bool minimized() const noexcept;
+        [[nodiscard]] bool enabled() const noexcept;
+        [[nodiscard]] bool visible() const noexcept;
+        [[nodiscard]] bool focused() const noexcept;
+        [[nodiscard]] bool minimized() const noexcept;
 
-        bool fullscreen() const noexcept;
+        [[nodiscard]] bool fullscreen() const noexcept;
         bool toggle_fullscreen(bool yesno) noexcept;
 
         void hide_cursor() noexcept;
         void show_cursor() noexcept;
-        bool is_cursor_hidden() const noexcept;
+        [[nodiscard]] bool is_cursor_hidden() const noexcept;
 
-        v2u real_size() const noexcept;
-        v2u virtual_size() const noexcept;
-        v2u framebuffer_size() const noexcept;
+        [[nodiscard]] v2u real_size() const noexcept;
+        [[nodiscard]] v2u virtual_size() const noexcept;
+        [[nodiscard]] v2u framebuffer_size() const noexcept;
 
-        const str& title() const noexcept;
+        [[nodiscard]] const str& title() const noexcept;
         void set_title(str_view title);
 
-        bool should_close() const noexcept;
+        [[nodiscard]] bool should_close() const noexcept;
         void set_should_close(bool yesno) noexcept;
 
         void bind_context() noexcept;

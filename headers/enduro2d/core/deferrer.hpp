@@ -15,11 +15,11 @@ namespace e2d
         deferrer();
         ~deferrer() noexcept final = default;
 
-        stdex::jobber& worker() noexcept;
-        const stdex::jobber& worker() const noexcept;
+        [[nodiscard]] stdex::jobber& worker() noexcept;
+        [[nodiscard]] const stdex::jobber& worker() const noexcept;
 
-        stdex::scheduler& scheduler() noexcept;
-        const stdex::scheduler& scheduler() const noexcept;
+        [[nodiscard]] stdex::scheduler& scheduler() noexcept;
+        [[nodiscard]] const stdex::scheduler& scheduler() const noexcept;
 
         template < typename F
                  , typename... Args
@@ -42,11 +42,13 @@ namespace e2d
 namespace e2d
 {
     template < typename F , typename... Args , typename R >
+    [[nodiscard]]
     stdex::promise<R> deferrer::do_in_main_thread(F&& f, Args&&... args) {
         return scheduler_.schedule(std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     template < typename F , typename... Args , typename R >
+    [[nodiscard]]
     stdex::promise<R> deferrer::do_in_worker_thread(F&& f, Args&&... args) {
         return worker_.async(std::forward<F>(f), std::forward<Args>(args)...);
     }

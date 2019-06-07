@@ -17,16 +17,16 @@ namespace e2d
         mouse();
         ~mouse() noexcept;
 
-        v2f cursor_pos() const noexcept;
-        v2f scroll_delta() const noexcept;
+        [[nodiscard]] v2f cursor_pos() const noexcept;
+        [[nodiscard]] v2f scroll_delta() const noexcept;
 
-        bool is_any_button_pressed() const noexcept;
-        bool is_any_button_just_pressed() const noexcept;
-        bool is_any_button_just_released() const noexcept;
+        [[nodiscard]] bool is_any_button_pressed() const noexcept;
+        [[nodiscard]] bool is_any_button_just_pressed() const noexcept;
+        [[nodiscard]] bool is_any_button_just_released() const noexcept;
 
-        bool is_button_pressed(mouse_button btn) const noexcept;
-        bool is_button_just_pressed(mouse_button btn) const noexcept;
-        bool is_button_just_released(mouse_button btn) const noexcept;
+        [[nodiscard]] bool is_button_pressed(mouse_button btn) const noexcept;
+        [[nodiscard]] bool is_button_just_pressed(mouse_button btn) const noexcept;
+        [[nodiscard]] bool is_button_just_released(mouse_button btn) const noexcept;
 
         void extract_pressed_buttons(vector<mouse_button>& dst) const;
         void extract_just_pressed_buttons(vector<mouse_button>& dst) const;
@@ -42,16 +42,16 @@ namespace e2d
         keyboard();
         ~keyboard() noexcept;
 
-        str32 input_text() const;
+        [[nodiscard]] str32 input_text() const;
         void extract_input_text(str32& dst) const;
 
-        bool is_any_key_pressed() const noexcept;
-        bool is_any_key_just_pressed() const noexcept;
-        bool is_any_key_just_released() const noexcept;
+        [[nodiscard]] bool is_any_key_pressed() const noexcept;
+        [[nodiscard]] bool is_any_key_just_pressed() const noexcept;
+        [[nodiscard]] bool is_any_key_just_released() const noexcept;
 
-        bool is_key_pressed(keyboard_key key) const noexcept;
-        bool is_key_just_pressed(keyboard_key key) const noexcept;
-        bool is_key_just_released(keyboard_key key) const noexcept;
+        [[nodiscard]] bool is_key_pressed(keyboard_key key) const noexcept;
+        [[nodiscard]] bool is_key_just_pressed(keyboard_key key) const noexcept;
+        [[nodiscard]] bool is_key_just_released(keyboard_key key) const noexcept;
 
         void extract_pressed_keys(vector<keyboard_key>& dst) const;
         void extract_just_pressed_keys(vector<keyboard_key>& dst) const;
@@ -98,8 +98,8 @@ namespace e2d
         input();
         ~input() noexcept final;
 
-        const class mouse& mouse() const noexcept;
-        const class keyboard& keyboard() const noexcept;
+        [[nodiscard]] const class mouse& mouse() const noexcept;
+        [[nodiscard]] const class keyboard& keyboard() const noexcept;
 
         void post_event(input_char_event evt) noexcept;
         void post_event(move_cursor_event evt) noexcept;

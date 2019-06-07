@@ -49,6 +49,7 @@ namespace e2d
 namespace e2d
 {
     template < typename ModuleT >
+    [[nodiscard]]
     ModuleT& the() {
         return modules::instance<ModuleT>();
     }
@@ -116,8 +117,8 @@ namespace e2d
         unknown
     };
 
-    const char* mouse_button_to_cstr(mouse_button btn) noexcept;
-    const char* keyboard_key_to_cstr(keyboard_key key) noexcept;
-    const char* mouse_button_action_to_cstr(mouse_button_action action) noexcept;
-    const char* keyboard_key_action_to_cstr(keyboard_key_action action) noexcept;
+    [[nodiscard]] const char* mouse_button_to_cstr(mouse_button btn) noexcept;
+    [[nodiscard]] const char* keyboard_key_to_cstr(keyboard_key key) noexcept;
+    [[nodiscard]] const char* mouse_button_action_to_cstr(mouse_button_action action) noexcept;
+    [[nodiscard]] const char* keyboard_key_action_to_cstr(keyboard_key_action action) noexcept;
 }

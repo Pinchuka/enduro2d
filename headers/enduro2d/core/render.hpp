@@ -76,19 +76,21 @@ namespace e2d
 
         pixel_declaration(pixel_type type) noexcept;
 
-        pixel_type type() const noexcept;
-        bool is_color() const noexcept;
-        bool is_depth() const noexcept;
-        bool is_stencil() const noexcept;
-        bool is_compressed() const noexcept;
-        std::size_t bits_per_pixel() const noexcept;
+        [[nodiscard]] pixel_type type() const noexcept;
+        [[nodiscard]] bool is_color() const noexcept;
+        [[nodiscard]] bool is_depth() const noexcept;
+        [[nodiscard]] bool is_stencil() const noexcept;
+        [[nodiscard]] bool is_compressed() const noexcept;
+        [[nodiscard]] std::size_t bits_per_pixel() const noexcept;
     private:
         pixel_type type_ = pixel_type::rgba8;
     };
 
+    [[nodiscard]]
     bool operator==(
         const pixel_declaration& l,
         const pixel_declaration& r) noexcept;
+    [[nodiscard]]
     bool operator!=(
         const pixel_declaration& l,
         const pixel_declaration& r) noexcept;
@@ -114,15 +116,17 @@ namespace e2d
 
         index_declaration(index_type type) noexcept;
 
-        index_type type() const noexcept;
-        std::size_t bytes_per_index() const noexcept;
+        [[nodiscard]] index_type type() const noexcept;
+        [[nodiscard]] std::size_t bytes_per_index() const noexcept;
     private:
         index_type type_ = index_type::unsigned_short;
     };
 
+    [[nodiscard]]
     bool operator==(
         const index_declaration& l,
         const index_declaration& r) noexcept;
+    [[nodiscard]]
     bool operator!=(
         const index_declaration& l,
         const index_declaration& r) noexcept;
@@ -164,7 +168,7 @@ namespace e2d
                 attribute_type type,
                 bool normalized) noexcept;
 
-            std::size_t row_size() const noexcept;
+            [[nodiscard]] std::size_t row_size() const noexcept;
         };
     public:
         vertex_declaration() = default;
@@ -187,9 +191,9 @@ namespace e2d
             attribute_type type,
             bool normalized) noexcept;
 
-        const attribute_info& attribute(std::size_t index) const noexcept;
-        std::size_t attribute_count() const noexcept;
-        std::size_t bytes_per_vertex() const noexcept;
+        [[nodiscard]] const attribute_info& attribute(std::size_t index) const noexcept;
+        [[nodiscard]] std::size_t attribute_count() const noexcept;
+        [[nodiscard]] std::size_t bytes_per_vertex() const noexcept;
     private:
         constexpr static std::size_t max_attribute_count = 8;
         std::array<attribute_info, max_attribute_count> attributes_;
@@ -197,15 +201,19 @@ namespace e2d
         std::size_t bytes_per_vertex_ = 0;
     };
 
+    [[nodiscard]]
     bool operator==(
         const vertex_declaration& l,
         const vertex_declaration& r) noexcept;
+    [[nodiscard]]
     bool operator!=(
         const vertex_declaration& l,
         const vertex_declaration& r) noexcept;
+    [[nodiscard]]
     bool operator==(
         const vertex_declaration::attribute_info& l,
         const vertex_declaration::attribute_info& r) noexcept;
+    [[nodiscard]]
     bool operator!=(
         const vertex_declaration::attribute_info& l,
         const vertex_declaration::attribute_info& r) noexcept;
@@ -239,8 +247,8 @@ namespace e2d
         explicit texture(internal_state_uptr);
         ~texture() noexcept;
     public:
-        const v2u& size() const noexcept;
-        const pixel_declaration& decl() const noexcept;
+        [[nodiscard]] const v2u& size() const noexcept;
+        [[nodiscard]] const pixel_declaration& decl() const noexcept;
     private:
         internal_state_uptr state_;
     };
@@ -265,9 +273,9 @@ namespace e2d
         ~index_buffer() noexcept;
     public:
         void update(buffer_view indices, std::size_t offset) noexcept;
-        std::size_t buffer_size() const noexcept;
-        std::size_t index_count() const noexcept;
-        const index_declaration& decl() const noexcept;
+        [[nodiscard]] std::size_t buffer_size() const noexcept;
+        [[nodiscard]] std::size_t index_count() const noexcept;
+        [[nodiscard]] const index_declaration& decl() const noexcept;
     private:
         internal_state_uptr state_;
     };
@@ -292,9 +300,9 @@ namespace e2d
         ~vertex_buffer() noexcept;
     public:
         void update(buffer_view vertices, std::size_t offset) noexcept;
-        std::size_t buffer_size() const noexcept;
-        std::size_t vertex_count() const noexcept;
-        const vertex_declaration& decl() const noexcept;
+        [[nodiscard]] std::size_t buffer_size() const noexcept;
+        [[nodiscard]] std::size_t vertex_count() const noexcept;
+        [[nodiscard]] const vertex_declaration& decl() const noexcept;
     private:
         internal_state_uptr state_;
     };
@@ -318,9 +326,9 @@ namespace e2d
         explicit render_target(internal_state_uptr);
         ~render_target() noexcept;
     public:
-        const v2u& size() const noexcept;
-        const texture_ptr& color() const noexcept;
-        const texture_ptr& depth() const noexcept;
+        [[nodiscard]] const v2u& size() const noexcept;
+        [[nodiscard]] const texture_ptr& color() const noexcept;
+        [[nodiscard]] const texture_ptr& depth() const noexcept;
     private:
         internal_state_uptr state_;
     };
@@ -443,10 +451,10 @@ namespace e2d
             depth_state& write(bool enable) noexcept;
             depth_state& func(compare_func func) noexcept;
 
-            f32 range_near() const noexcept;
-            f32 range_far() const noexcept;
-            bool write() const noexcept;
-            compare_func func() const noexcept;
+            [[nodiscard]] f32 range_near() const noexcept;
+            [[nodiscard]] f32 range_far() const noexcept;
+            [[nodiscard]] bool write() const noexcept;
+            [[nodiscard]] compare_func func() const noexcept;
         private:
             f32 range_near_ = 0.0f;
             f32 range_far_ = 1.0f;
@@ -460,13 +468,13 @@ namespace e2d
             stencil_state& func(compare_func func, u8 ref, u8 mask) noexcept;
             stencil_state& op(stencil_op pass, stencil_op sfail, stencil_op zfail) noexcept;
 
-            u8 write() const noexcept;
-            compare_func func() const noexcept;
-            u8 ref() const noexcept;
-            u8 mask() const noexcept;
-            stencil_op pass() const noexcept;
-            stencil_op sfail() const noexcept;
-            stencil_op zfail() const noexcept;
+            [[nodiscard]] u8 write() const noexcept;
+            [[nodiscard]] compare_func func() const noexcept;
+            [[nodiscard]] u8 ref() const noexcept;
+            [[nodiscard]] u8 mask() const noexcept;
+            [[nodiscard]] stencil_op pass() const noexcept;
+            [[nodiscard]] stencil_op sfail() const noexcept;
+            [[nodiscard]] stencil_op zfail() const noexcept;
         private:
             u8 write_ = 1;
             u8 ref_ = 0;
@@ -482,8 +490,8 @@ namespace e2d
             culling_state& mode(culling_mode mode) noexcept;
             culling_state& face(culling_face face) noexcept;
 
-            culling_mode mode() const noexcept;
-            culling_face face() const noexcept;
+            [[nodiscard]] culling_mode mode() const noexcept;
+            [[nodiscard]] culling_face face() const noexcept;
         private:
             culling_mode mode_ = culling_mode::ccw;
             culling_face face_ = culling_face::back;
@@ -510,17 +518,17 @@ namespace e2d
             blending_state& rgb_equation(blending_equation equation) noexcept;
             blending_state& alpha_equation(blending_equation equation) noexcept;
 
-            const color& constant_color() const noexcept;
-            blending_color_mask color_mask() const noexcept;
+            [[nodiscard]] const color& constant_color() const noexcept;
+            [[nodiscard]] blending_color_mask color_mask() const noexcept;
 
-            blending_factor src_rgb_factor() const noexcept;
-            blending_factor dst_rgb_factor() const noexcept;
+            [[nodiscard]] blending_factor src_rgb_factor() const noexcept;
+            [[nodiscard]] blending_factor dst_rgb_factor() const noexcept;
 
-            blending_factor src_alpha_factor() const noexcept;
-            blending_factor dst_alpha_factor() const noexcept;
+            [[nodiscard]] blending_factor src_alpha_factor() const noexcept;
+            [[nodiscard]] blending_factor dst_alpha_factor() const noexcept;
 
-            blending_equation rgb_equation() const noexcept;
-            blending_equation alpha_equation() const noexcept;
+            [[nodiscard]] blending_equation rgb_equation() const noexcept;
+            [[nodiscard]] blending_equation alpha_equation() const noexcept;
         private:
             color constant_color_ = color::clear();
             blending_color_mask color_mask_ = blending_color_mask::rgba;
@@ -539,10 +547,10 @@ namespace e2d
             capabilities_state& depth_test(bool enable) noexcept;
             capabilities_state& stencil_test(bool enable) noexcept;
 
-            bool culling() const noexcept;
-            bool blending() const noexcept;
-            bool depth_test() const noexcept;
-            bool stencil_test() const noexcept;
+            [[nodiscard]] bool culling() const noexcept;
+            [[nodiscard]] bool blending() const noexcept;
+            [[nodiscard]] bool depth_test() const noexcept;
+            [[nodiscard]] bool stencil_test() const noexcept;
         private:
             bool culling_ = false;
             bool blending_ = false;
@@ -558,17 +566,17 @@ namespace e2d
             state_block& blending(const blending_state& state_block) noexcept;
             state_block& capabilities(const capabilities_state& state_block) noexcept;
 
-            depth_state& depth() noexcept;
-            stencil_state& stencil() noexcept;
-            culling_state& culling() noexcept;
-            blending_state& blending() noexcept;
-            capabilities_state& capabilities() noexcept;
+            [[nodiscard]] depth_state& depth() noexcept;
+            [[nodiscard]] stencil_state& stencil() noexcept;
+            [[nodiscard]] culling_state& culling() noexcept;
+            [[nodiscard]] blending_state& blending() noexcept;
+            [[nodiscard]] capabilities_state& capabilities() noexcept;
 
-            const depth_state& depth() const noexcept;
-            const stencil_state& stencil() const noexcept;
-            const culling_state& culling() const noexcept;
-            const blending_state& blending() const noexcept;
-            const capabilities_state& capabilities() const noexcept;
+            [[nodiscard]] const depth_state& depth() const noexcept;
+            [[nodiscard]] const stencil_state& stencil() const noexcept;
+            [[nodiscard]] const culling_state& culling() const noexcept;
+            [[nodiscard]] const blending_state& blending() const noexcept;
+            [[nodiscard]] const capabilities_state& capabilities() const noexcept;
         private:
             depth_state depth_;
             stencil_state stencil_;
@@ -590,14 +598,14 @@ namespace e2d
             sampler_state& min_filter(sampler_min_filter min) noexcept;
             sampler_state& mag_filter(sampler_mag_filter mag) noexcept;
 
-            const texture_ptr& texture() const noexcept;
+            [[nodiscard]] const texture_ptr& texture() const noexcept;
 
-            sampler_wrap s_wrap() const noexcept;
-            sampler_wrap t_wrap() const noexcept;
-            sampler_wrap r_wrap() const noexcept;
+            [[nodiscard]] sampler_wrap s_wrap() const noexcept;
+            [[nodiscard]] sampler_wrap t_wrap() const noexcept;
+            [[nodiscard]] sampler_wrap r_wrap() const noexcept;
 
-            sampler_min_filter min_filter() const noexcept;
-            sampler_mag_filter mag_filter() const noexcept;
+            [[nodiscard]] sampler_min_filter min_filter() const noexcept;
+            [[nodiscard]] sampler_mag_filter mag_filter() const noexcept;
         private:
             texture_ptr texture_;
             sampler_wrap s_wrap_ = sampler_wrap::repeat;
@@ -624,19 +632,19 @@ namespace e2d
             property_map(const property_map& other) = default;
             property_map& operator=(const property_map& other) = default;
 
-            T* find(str_hash key) noexcept;
-            const T* find(str_hash key) const noexcept;
+            [[nodiscard]] T* find(str_hash key) noexcept;
+            [[nodiscard]] const T* find(str_hash key) const noexcept;
 
             void assign(str_hash key, T&& value);
             void assign(str_hash key, const T& value);
 
             void clear() noexcept;
-            std::size_t size() const noexcept;
+            [[nodiscard]] std::size_t size() const noexcept;
 
             template < typename F >
             void foreach(F&& f) const;
             void merge(const property_map& other);
-            bool equals(const property_map& other) const noexcept;
+            [[nodiscard]] bool equals(const property_map& other) const noexcept;
         private:
             flat_map<str_hash, T> values_;
         };
@@ -654,20 +662,20 @@ namespace e2d
 
             property_block& clear() noexcept;
             property_block& merge(const property_block& pb);
-            bool equals(const property_block& other) const noexcept;
+            [[nodiscard]] bool equals(const property_block& other) const noexcept;
 
             property_block& sampler(str_hash name, const sampler_state& s);
-            sampler_state* sampler(str_hash name) noexcept;
-            const sampler_state* sampler(str_hash name) const noexcept;
+            [[nodiscard]] sampler_state* sampler(str_hash name) noexcept;
+            [[nodiscard]] const sampler_state* sampler(str_hash name) const noexcept;
 
             template < typename T >
             property_block& property(str_hash name, T&& v);
             template < typename T >
-            const T* property(str_hash name) const noexcept;
+            [[nodiscard]] const T* property(str_hash name) const noexcept;
 
             property_block& property(str_hash name, const property_value& v);
-            property_value* property(str_hash name) noexcept;
-            const property_value* property(str_hash name) const noexcept;
+            [[nodiscard]] property_value* property(str_hash name) noexcept;
+            [[nodiscard]] const property_value* property(str_hash name) const noexcept;
 
             template < typename F >
             void foreach_by_samplers(F&& f) const;
@@ -675,8 +683,8 @@ namespace e2d
             template < typename F >
             void foreach_by_properties(F&& f) const;
 
-            std::size_t sampler_count() const noexcept;
-            std::size_t property_count() const noexcept;
+            [[nodiscard]] std::size_t sampler_count() const noexcept;
+            [[nodiscard]] std::size_t property_count() const noexcept;
         private:
             property_map<sampler_state> samplers_;
             property_map<property_value> properties_;
@@ -688,13 +696,13 @@ namespace e2d
             pass_state& states(const state_block& states) noexcept;
             pass_state& properties(const property_block& properties) noexcept;
 
-            shader_ptr& shader() noexcept;
-            state_block& states() noexcept;
-            property_block& properties() noexcept;
+            [[nodiscard]] shader_ptr& shader() noexcept;
+            [[nodiscard]] state_block& states() noexcept;
+            [[nodiscard]] property_block& properties() noexcept;
 
-            const shader_ptr& shader() const noexcept;
-            const state_block& states() const noexcept;
-            const property_block& properties() const noexcept;
+            [[nodiscard]] const shader_ptr& shader() const noexcept;
+            [[nodiscard]] const state_block& states() const noexcept;
+            [[nodiscard]] const property_block& properties() const noexcept;
         private:
             property_block properties_;
             shader_ptr shader_;
@@ -704,18 +712,18 @@ namespace e2d
         class material final {
         public:
             material& clear() noexcept;
-            bool equals(const material& other) const noexcept;
+            [[nodiscard]] bool equals(const material& other) const noexcept;
 
             material& add_pass(const pass_state& pass) noexcept;
-            std::size_t pass_count() const noexcept;
+            [[nodiscard]] std::size_t pass_count() const noexcept;
 
             material& properties(const property_block& properties) noexcept;
 
-            pass_state& pass(std::size_t index) noexcept;
-            const pass_state& pass(std::size_t index) const noexcept;
+            [[nodiscard]] pass_state& pass(std::size_t index) noexcept;
+            [[nodiscard]] const pass_state& pass(std::size_t index) const noexcept;
 
-            property_block& properties() noexcept;
-            const property_block& properties() const noexcept;
+            [[nodiscard]] property_block& properties() noexcept;
+            [[nodiscard]] const property_block& properties() const noexcept;
         private:
             constexpr static std::size_t max_pass_count = 8;
             std::array<pass_state, max_pass_count> passes_;
@@ -726,22 +734,22 @@ namespace e2d
         class geometry final {
         public:
             geometry& clear() noexcept;
-            bool equals(const geometry& other) const noexcept;
+            [[nodiscard]] bool equals(const geometry& other) const noexcept;
 
             geometry& add_vertices(const vertex_buffer_ptr& vb) noexcept;
-            std::size_t vertices_count() const noexcept;
+            [[nodiscard]] std::size_t vertices_count() const noexcept;
 
             geometry& topo(topology tp) noexcept;
             geometry& indices(const index_buffer_ptr& ib) noexcept;
             geometry& vertices(std::size_t index, const vertex_buffer_ptr& vb) noexcept;
 
-            topology& topo() noexcept;
-            index_buffer_ptr& indices() noexcept;
-            vertex_buffer_ptr& vertices(std::size_t index) noexcept;
+            [[nodiscard]] topology& topo() noexcept;
+            [[nodiscard]] index_buffer_ptr& indices() noexcept;
+            [[nodiscard]] vertex_buffer_ptr& vertices(std::size_t index) noexcept;
 
-            const topology& topo() const noexcept;
-            const index_buffer_ptr& indices() const noexcept;
-            const vertex_buffer_ptr& vertices(std::size_t index) const noexcept;
+            [[nodiscard]] const topology& topo() const noexcept;
+            [[nodiscard]] const index_buffer_ptr& indices() const noexcept;
+            [[nodiscard]] const vertex_buffer_ptr& vertices(std::size_t index) const noexcept;
         private:
             constexpr static std::size_t max_vertices_count = 8;
             index_buffer_ptr indices_;
@@ -769,11 +777,11 @@ namespace e2d
             draw_command& geometry_ref(const geometry& value) noexcept;
             draw_command& properties_ref(const property_block& value);
 
-            std::size_t first_index() const noexcept;
-            std::size_t index_count() const noexcept;
-            const material& material_ref() const noexcept;
-            const geometry& geometry_ref() const noexcept;
-            const property_block& properties_ref() const noexcept;
+            [[nodiscard]] std::size_t first_index() const noexcept;
+            [[nodiscard]] std::size_t index_count() const noexcept;
+            [[nodiscard]] const material& material_ref() const noexcept;
+            [[nodiscard]] const geometry& geometry_ref() const noexcept;
+            [[nodiscard]] const property_block& properties_ref() const noexcept;
         private:
             std::size_t first_index_ = 0;
             std::size_t index_count_ = std::size_t(-1);
@@ -801,16 +809,16 @@ namespace e2d
             clear_command& depth_value(f32 value) noexcept;
             clear_command& stencil_value(u8 value) noexcept;
 
-            color& color_value() noexcept;
-            f32& depth_value() noexcept;
-            u8& stencil_value() noexcept;
+            [[nodiscard]] color& color_value() noexcept;
+            [[nodiscard]] f32& depth_value() noexcept;
+            [[nodiscard]] u8& stencil_value() noexcept;
 
-            const color& color_value() const noexcept;
-            f32 depth_value() const noexcept;
-            u8 stencil_value() const noexcept;
+            [[nodiscard]] const color& color_value() const noexcept;
+            [[nodiscard]] f32 depth_value() const noexcept;
+            [[nodiscard]] u8 stencil_value() const noexcept;
 
-            buffer& clear_buffer() noexcept;
-            buffer clear_buffer() const noexcept;
+            [[nodiscard]] buffer& clear_buffer() noexcept;
+            [[nodiscard]] buffer clear_buffer() const noexcept;
         private:
             color color_value_ = color::clear();
             f32 depth_value_ = 1.f;
@@ -823,8 +831,8 @@ namespace e2d
             target_command() = default;
             target_command(const render_target_ptr& rt) noexcept;
             target_command& target(const render_target_ptr& value) noexcept;
-            render_target_ptr& target() noexcept;
-            const render_target_ptr& target() const noexcept;
+            [[nodiscard]] render_target_ptr& target() noexcept;
+            [[nodiscard]] const render_target_ptr& target() const noexcept;
         private:
             render_target_ptr target_;
         };
@@ -839,13 +847,13 @@ namespace e2d
             viewport_command& scissor_rect(const b2u& value) noexcept;
             viewport_command& scissoring(bool value) noexcept;
 
-            b2u& viewport_rect() noexcept;
-            b2u& scissor_rect() noexcept;
-            bool& scissoring() noexcept;
+            [[nodiscard]] b2u& viewport_rect() noexcept;
+            [[nodiscard]] b2u& scissor_rect() noexcept;
+            [[nodiscard]] bool& scissoring() noexcept;
 
-            const b2u& viewport_rect() const noexcept;
-            const b2u& scissor_rect() const noexcept;
-            bool scissoring() const noexcept;
+            [[nodiscard]] const b2u& viewport_rect() const noexcept;
+            [[nodiscard]] const b2u& scissor_rect() const noexcept;
+            [[nodiscard]] bool scissoring() const noexcept;
         private:
             b2u viewport_rect_ = b2u::zero();
             b2u scissor_rect_ = b2u::zero();
@@ -867,8 +875,8 @@ namespace e2d
             command_block& add_command(command_value&& value);
             command_block& add_command(const command_value& value);
 
-            const command_value& command(std::size_t index) const noexcept;
-            std::size_t command_count() const noexcept;
+            [[nodiscard]] const command_value& command(std::size_t index) const noexcept;
+            [[nodiscard]] std::size_t command_count() const noexcept;
         private:
             std::array<command_value, N> commands_;
             std::size_t command_count_ = 0;
@@ -897,34 +905,42 @@ namespace e2d
         render(debug& d, window& w);
         ~render() noexcept final;
 
+        [[nodiscard]]
         shader_ptr create_shader(
             const str& vertex_source,
             const str& fragment_source);
 
+        [[nodiscard]]
         shader_ptr create_shader(
             const input_stream_uptr& vertex_stream,
             const input_stream_uptr& fragment_stream);
 
+        [[nodiscard]]
         texture_ptr create_texture(
             const image& image);
 
+        [[nodiscard]]
         texture_ptr create_texture(
             const input_stream_uptr& image_stream);
 
+        [[nodiscard]]
         texture_ptr create_texture(
             const v2u& size,
             const pixel_declaration& decl);
 
+        [[nodiscard]]
         index_buffer_ptr create_index_buffer(
             buffer_view indices,
             const index_declaration& decl,
             index_buffer::usage usage);
 
+        [[nodiscard]]
         vertex_buffer_ptr create_vertex_buffer(
             buffer_view vertices,
             const vertex_declaration& decl,
             vertex_buffer::usage usage);
 
+        [[nodiscard]]
         render_target_ptr create_render_target(
             const v2u& size,
             const pixel_declaration& color_decl,
@@ -940,10 +956,10 @@ namespace e2d
         render& execute(const target_command& command);
         render& execute(const viewport_command& command);
 
-        const device_caps& device_capabilities() const noexcept;
-        bool is_pixel_supported(const pixel_declaration& decl) const noexcept;
-        bool is_index_supported(const index_declaration& decl) const noexcept;
-        bool is_vertex_supported(const vertex_declaration& decl) const noexcept;
+        [[nodiscard]] const device_caps& device_capabilities() const noexcept;
+        [[nodiscard]] bool is_pixel_supported(const pixel_declaration& decl) const noexcept;
+        [[nodiscard]] bool is_index_supported(const index_declaration& decl) const noexcept;
+        [[nodiscard]] bool is_vertex_supported(const vertex_declaration& decl) const noexcept;
     private:
         class internal_state;
         std::unique_ptr<internal_state> state_;
@@ -956,50 +972,50 @@ namespace e2d
     // render::state_block
     //
 
-    bool operator==(const render::state_block& l, const render::state_block& r) noexcept;
-    bool operator!=(const render::state_block& l, const render::state_block& r) noexcept;
+    [[nodiscard]] bool operator==(const render::state_block& l, const render::state_block& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::state_block& l, const render::state_block& r) noexcept;
 
-    bool operator==(const render::depth_state& l, const render::depth_state& r) noexcept;
-    bool operator!=(const render::depth_state& l, const render::depth_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::depth_state& l, const render::depth_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::depth_state& l, const render::depth_state& r) noexcept;
 
-    bool operator==(const render::stencil_state& l, const render::stencil_state& r) noexcept;
-    bool operator!=(const render::stencil_state& l, const render::stencil_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::stencil_state& l, const render::stencil_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::stencil_state& l, const render::stencil_state& r) noexcept;
 
-    bool operator==(const render::culling_state& l, const render::culling_state& r) noexcept;
-    bool operator!=(const render::culling_state& l, const render::culling_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::culling_state& l, const render::culling_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::culling_state& l, const render::culling_state& r) noexcept;
 
-    bool operator==(const render::blending_state& l, const render::blending_state& r) noexcept;
-    bool operator!=(const render::blending_state& l, const render::blending_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::blending_state& l, const render::blending_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::blending_state& l, const render::blending_state& r) noexcept;
 
-    bool operator==(const render::capabilities_state& l, const render::capabilities_state& r) noexcept;
-    bool operator!=(const render::capabilities_state& l, const render::capabilities_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::capabilities_state& l, const render::capabilities_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::capabilities_state& l, const render::capabilities_state& r) noexcept;
 
     //
     // render::property_block
     //
 
-    bool operator==(const render::property_block& l, const render::property_block& r) noexcept;
-    bool operator!=(const render::property_block& l, const render::property_block& r) noexcept;
+    [[nodiscard]] bool operator==(const render::property_block& l, const render::property_block& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::property_block& l, const render::property_block& r) noexcept;
 
-    bool operator==(const render::sampler_state& l, const render::sampler_state& r) noexcept;
-    bool operator!=(const render::sampler_state& l, const render::sampler_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::sampler_state& l, const render::sampler_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::sampler_state& l, const render::sampler_state& r) noexcept;
 
     //
     // render::material
     //
 
-    bool operator==(const render::material& l, const render::material& r) noexcept;
-    bool operator!=(const render::material& l, const render::material& r) noexcept;
+    [[nodiscard]] bool operator==(const render::material& l, const render::material& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::material& l, const render::material& r) noexcept;
 
-    bool operator==(const render::pass_state& l, const render::pass_state& r) noexcept;
-    bool operator!=(const render::pass_state& l, const render::pass_state& r) noexcept;
+    [[nodiscard]] bool operator==(const render::pass_state& l, const render::pass_state& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::pass_state& l, const render::pass_state& r) noexcept;
 
     //
     // render::geometry
     //
 
-    bool operator==(const render::geometry& l, const render::geometry& r) noexcept;
-    bool operator!=(const render::geometry& l, const render::geometry& r) noexcept;
+    [[nodiscard]] bool operator==(const render::geometry& l, const render::geometry& r) noexcept;
+    [[nodiscard]] bool operator!=(const render::geometry& l, const render::geometry& r) noexcept;
 }
 
 #include "render.inl"
