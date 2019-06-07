@@ -289,6 +289,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_integral_v<T>, T>
     default_precision() noexcept {
         return 0;
@@ -296,6 +297,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_same_v<T, f32>, T>
     default_precision() noexcept {
         return 0.00001f;
@@ -303,6 +305,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_same_v<T, f64>, T>
     default_precision() noexcept {
         return 0.0000001;
@@ -314,6 +317,7 @@ namespace e2d::math
 
     template < typename T, typename U >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -333,6 +337,7 @@ namespace e2d::math
 
     template < typename T, typename U >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -352,6 +357,7 @@ namespace e2d::math
 
     template < typename T, typename U >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -371,6 +377,7 @@ namespace e2d::math
 
     template < typename T, typename U >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -381,6 +388,7 @@ namespace e2d::math
 
     template < typename T, typename U >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_unsigned_v<T> &&
         std::is_convertible_v<U,T>,
@@ -451,6 +459,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_unsigned_v<T>, bool>
     is_power_of_2(T v) noexcept {
         return v && !(v & (v - 1));
@@ -458,6 +467,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_unsigned_v<T>, T>
     max_power_of_2() noexcept {
         return T(1) << (sizeof(T) * 8 - 1);
@@ -465,6 +475,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_unsigned_v<T>, T>
     next_power_of_2(T v) noexcept {
         E2D_ASSERT(v <= max_power_of_2<T>());
@@ -575,6 +586,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_integral_v<T> && std::is_signed_v<T>,
         bool>
@@ -584,6 +596,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_integral_v<T> && std::is_unsigned_v<T>,
         bool>
@@ -594,6 +607,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         bool>
@@ -618,6 +632,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     min(T l, T r) noexcept {
         return l < r ? l : r;
@@ -625,6 +640,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     max(T l, T r) noexcept {
         return l < r ? r : l;
@@ -632,6 +648,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_arithmetic_v<T>, std::pair<T,T>>
     minmax(T l, T r) noexcept {
         return l < r
@@ -645,6 +662,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     clamp(T v, T vmin, T vmax) noexcept {
         std::tie(vmin, vmax) = minmax(vmin, vmax);
@@ -653,6 +671,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_arithmetic_v<T>, T>
     saturate(T v) noexcept {
         return clamp(v, T(0), T(1));
@@ -740,13 +759,13 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    T lerp(T l, T r, T v) noexcept {
+    constexpr T lerp(T l, T r, T v) noexcept {
         return l + (r - l) * v;
     }
 
     template < typename T >
     [[nodiscard]]
-    T inverse_lerp(T l, T r, T v) noexcept {
+    constexpr T inverse_lerp(T l, T r, T v) noexcept {
         E2D_ASSERT(!approximately(l, r, T(0)));
         return (v - l) / (r - l);
     }

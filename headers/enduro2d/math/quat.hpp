@@ -39,13 +39,13 @@ namespace e2d
         constexpr explicit quat(const vec4<T>& other) noexcept;
 
         template < typename To >
-        quat<To> cast_to() const noexcept;
+        constexpr quat<To> cast_to() const noexcept;
 
         T* data() noexcept;
-        const T* data() const noexcept;
+        constexpr const T* data() const noexcept;
 
         T& operator[](std::size_t index) noexcept;
-        T operator[](std::size_t index) const noexcept;
+        constexpr T operator[](std::size_t index) const noexcept;
 
         quat& operator+=(T v) noexcept;
         quat& operator*=(T v) noexcept;
@@ -86,7 +86,7 @@ namespace e2d
     template < typename T >
     template < typename To >
     [[nodiscard]]
-    quat<To> quat<T>::cast_to() const noexcept {
+    constexpr quat<To> quat<T>::cast_to() const noexcept {
         return {
             math::numeric_cast<To>(x),
             math::numeric_cast<To>(y),
@@ -102,7 +102,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    const T* quat<T>::data() const noexcept {
+    constexpr const T* quat<T>::data() const noexcept {
         return &x;
     }
 
@@ -115,7 +115,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    T quat<T>::operator[](std::size_t index) const noexcept {
+    constexpr T quat<T>::operator[](std::size_t index) const noexcept {
         E2D_ASSERT(index < 4);
         return data()[index];
     }
@@ -149,13 +149,13 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> make_quat(T x, T y, T z, T w) noexcept {
+    constexpr quat<T> make_quat(T x, T y, T z, T w) noexcept {
         return quat<T>(x, y, z, w);
     }
 
     template < typename T >
     [[nodiscard]]
-    quat<T> make_quat(const vec4<T>& other) noexcept {
+    constexpr quat<T> make_quat(const vec4<T>& other) noexcept {
         return quat<T>(other);
     }
 
@@ -185,7 +185,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    bool operator<(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr bool operator<(const quat<T>& l, const quat<T>& r) noexcept {
         return
             (l.x < r.x) ||
             (l.x == r.x && l.y < r.y) ||
@@ -195,19 +195,19 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    bool operator>(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr bool operator>(const quat<T>& l, const quat<T>& r) noexcept {
         return r < l;
     }
 
     template < typename T >
     [[nodiscard]]
-    bool operator<=(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr bool operator<=(const quat<T>& l, const quat<T>& r) noexcept {
         return !(r < l);
     }
 
     template < typename T >
     [[nodiscard]]
-    bool operator>=(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr bool operator>=(const quat<T>& l, const quat<T>& r) noexcept {
         return !(l < r);
     }
 
@@ -217,7 +217,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> operator+(const quat<T>& l, T v) noexcept {
+    constexpr quat<T> operator+(const quat<T>& l, T v) noexcept {
         return {
             l.x + v,
             l.y + v,
@@ -227,7 +227,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> operator*(const quat<T>& l, T v) noexcept {
+    constexpr quat<T> operator*(const quat<T>& l, T v) noexcept {
         return {
             l.x * v,
             l.y * v,
@@ -241,7 +241,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> operator+(T v, const quat<T>& r) noexcept {
+    constexpr quat<T> operator+(T v, const quat<T>& r) noexcept {
         return {
             v + r.x,
             v + r.y,
@@ -251,7 +251,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> operator*(T v, const quat<T>& r) noexcept {
+    constexpr quat<T> operator*(T v, const quat<T>& r) noexcept {
         return {
             v * r.x,
             v * r.y,
@@ -265,7 +265,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> operator+(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr quat<T> operator+(const quat<T>& l, const quat<T>& r) noexcept {
         return {
             l.x + r.x,
             l.y + r.y,
@@ -275,7 +275,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    quat<T> operator*(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr quat<T> operator*(const quat<T>& l, const quat<T>& r) noexcept {
         return {
             (l.w * r.x) + (l.x * r.w) + (l.y * r.z) - (l.z * r.y),
             (l.w * r.y) + (l.y * r.w) + (l.z * r.x) - (l.x * r.z),
@@ -289,7 +289,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec3<T> operator*(const vec3<T>& l, const quat<T>& r) noexcept {
+    constexpr vec3<T> operator*(const vec3<T>& l, const quat<T>& r) noexcept {
         const vec3<T> qvec{r.x, r.y, r.z};
         auto uv = math::cross(qvec, l);
         auto uuv = math::cross(qvec, uv);
@@ -385,7 +385,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    T dot(const quat<T>& l, const quat<T>& r) noexcept {
+    constexpr T dot(const quat<T>& l, const quat<T>& r) noexcept {
         return
             l.x * r.x +
             l.y * r.y +
@@ -409,7 +409,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    T length_squared(const quat<T>& v) noexcept {
+    constexpr T length_squared(const quat<T>& v) noexcept {
         return dot(v, v);
     }
 
@@ -445,7 +445,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    quat<T> lerp(const quat<T>& l, const quat<T>& r, T v) noexcept {
+    constexpr quat<T> lerp(const quat<T>& l, const quat<T>& r, T v) noexcept {
         return {
             math::lerp(l.x, r.x, v),
             math::lerp(l.y, r.y, v),
@@ -482,7 +482,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    quat<T> conjugated(const quat<T>& q) noexcept {
+    constexpr quat<T> conjugated(const quat<T>& q) noexcept {
         return {
             -q.x,
             -q.y,

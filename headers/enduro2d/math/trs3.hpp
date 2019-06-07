@@ -120,19 +120,19 @@ namespace e2d::math
 {
     template < typename T >
     [[nodiscard]]
-    trs3<T> make_translation_trs3(const vec3<T>& t) noexcept {
+    constexpr trs3<T> make_translation_trs3(const vec3<T>& t) noexcept {
         return trs3<T>(t, quat<T>::identity(), vec3<T>::unit());
     }
 
     template < typename T >
     [[nodiscard]]
-    trs3<T> make_rotation_trs3(const quat<T>& r) noexcept {
+    constexpr trs3<T> make_rotation_trs3(const quat<T>& r) noexcept {
         return trs3<T>(vec3<T>::zero(), r, vec3<T>::unit());
     }
 
     template < typename T >
     [[nodiscard]]
-    trs3<T> make_scale_trs3(const vec3<T>& s) noexcept {
+    constexpr trs3<T> make_scale_trs3(const vec3<T>& s) noexcept {
         return trs3<T>(vec3<T>::zero(), quat<T>::identity(), s);
     }
 

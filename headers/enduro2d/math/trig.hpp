@@ -13,6 +13,7 @@ namespace e2d::math
 {
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         rad<T>>
@@ -22,6 +23,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         rad<T>>
@@ -31,6 +33,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         rad<T>>
@@ -40,6 +43,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         rad<T>>
@@ -49,6 +53,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         rad<T>>
@@ -58,6 +63,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_floating_point_v<T>,
         rad<T>>
@@ -70,13 +76,13 @@ namespace e2d
 {
     template < typename T >
     [[nodiscard]]
-    deg<T> make_deg(T v) noexcept {
+    constexpr deg<T> make_deg(T v) noexcept {
         return make_unit<deg_tag>(v);
     }
 
     template < typename T >
     [[nodiscard]]
-    rad<T> make_rad(T v) noexcept {
+    constexpr rad<T> make_rad(T v) noexcept {
         return make_unit<rad_tag>(v);
     }
 
@@ -124,13 +130,13 @@ namespace e2d::math
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    deg<T> to_deg(const unit<T, Tag>& u) noexcept {
+    constexpr deg<T> to_deg(const unit<T, Tag>& u) noexcept {
         return u.template convert_to<deg_tag>();
     }
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    rad<T> to_rad(const unit<T, Tag>& u) noexcept {
+    constexpr rad<T> to_rad(const unit<T, Tag>& u) noexcept {
         return u.template convert_to<rad_tag>();
     }
 

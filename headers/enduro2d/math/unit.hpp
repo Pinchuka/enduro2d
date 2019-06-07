@@ -32,10 +32,10 @@ namespace e2d
         constexpr explicit unit(const unit<T, OtherTag>& other) noexcept;
 
         template < typename To >
-        unit<To, Tag> cast_to() const noexcept;
+        constexpr unit<To, Tag> cast_to() const noexcept;
 
         template < typename OtherTag >
-        unit<T, OtherTag> convert_to() const noexcept;
+        constexpr unit<T, OtherTag> convert_to() const noexcept;
 
         constexpr unit& operator*=(T v) noexcept;
         constexpr unit& operator/=(T v) noexcept;
@@ -75,14 +75,14 @@ namespace e2d
     template < typename T, typename Tag >
     template < typename To >
     [[nodiscard]]
-    unit<To, Tag> unit<T, Tag>::cast_to() const noexcept {
+    constexpr unit<To, Tag> unit<T, Tag>::cast_to() const noexcept {
         return unit<To, Tag>(math::numeric_cast<To>(value));
     }
 
     template < typename T, typename Tag >
     template < typename OtherTag >
     [[nodiscard]]
-    unit<T, OtherTag> unit<T, Tag>::convert_to() const noexcept {
+    constexpr unit<T, OtherTag> unit<T, Tag>::convert_to() const noexcept {
         return unit_converter<Tag, OtherTag>()(*this);
     }
 

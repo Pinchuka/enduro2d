@@ -29,7 +29,7 @@ namespace e2d
         static constexpr vec2 unit_x() noexcept;
         static constexpr vec2 unit_y() noexcept;
     public:
-       constexpr  vec2() noexcept = default;
+        constexpr vec2() noexcept = default;
         constexpr vec2(const vec2& other) noexcept = default;
         vec2& operator=(const vec2& other) noexcept = default;
 
@@ -39,13 +39,13 @@ namespace e2d
         constexpr explicit vec2(const vec4<T>& other) noexcept;
 
         template < typename To >
-        vec2<To> cast_to() const noexcept;
+        constexpr vec2<To> cast_to() const noexcept;
 
         T* data() noexcept;
-        const T* data() const noexcept;
+        constexpr const T* data() const noexcept;
 
         T& operator[](std::size_t index) noexcept;
-        T operator[](std::size_t index) const noexcept;
+        constexpr T operator[](std::size_t index) const noexcept;
 
         vec2& operator+=(T v) noexcept;
         vec2& operator-=(T v) noexcept;
@@ -108,7 +108,7 @@ namespace e2d
     template < typename T >
     template < typename To >
     [[nodiscard]]
-    vec2<To> vec2<T>::cast_to() const noexcept {
+    constexpr vec2<To> vec2<T>::cast_to() const noexcept {
         return {
             math::numeric_cast<To>(x),
             math::numeric_cast<To>(y)};
@@ -122,7 +122,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    const T* vec2<T>::data() const noexcept {
+    constexpr const T* vec2<T>::data() const noexcept {
         return &x;
     }
 
@@ -135,7 +135,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    T vec2<T>::operator[](std::size_t index) const noexcept {
+    constexpr T vec2<T>::operator[](std::size_t index) const noexcept {
         E2D_ASSERT(index < 2);
         return data()[index];
     }
@@ -208,25 +208,25 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> make_vec2(T v) noexcept {
+    constexpr vec2<T> make_vec2(T v) noexcept {
         return vec2<T>(v);
     }
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> make_vec2(T x, T y) noexcept {
+    constexpr vec2<T> make_vec2(T x, T y) noexcept {
         return vec2<T>(x, y);
     }
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> make_vec2(const vec3<T>& other) noexcept {
+    constexpr vec2<T> make_vec2(const vec3<T>& other) noexcept {
         return vec2<T>(other);
     }
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> make_vec2(const vec4<T>& other) noexcept {
+    constexpr vec2<T> make_vec2(const vec4<T>& other) noexcept {
         return vec2<T>(other);
     }
 
@@ -254,7 +254,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    bool operator<(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr bool operator<(const vec2<T>& l, const vec2<T>& r) noexcept {
         return
             (l.x < r.x) ||
             (l.x == r.x && l.y < r.y);
@@ -262,19 +262,19 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    bool operator>(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr bool operator>(const vec2<T>& l, const vec2<T>& r) noexcept {
         return r < l;
     }
 
     template < typename T >
     [[nodiscard]]
-    bool operator<=(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr bool operator<=(const vec2<T>& l, const vec2<T>& r) noexcept {
         return !(r < l);
     }
 
     template < typename T >
     [[nodiscard]]
-    bool operator>=(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr bool operator>=(const vec2<T>& l, const vec2<T>& r) noexcept {
         return !(l < r);
     }
 
@@ -284,7 +284,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator-(const vec2<T>& v) noexcept {
+    constexpr vec2<T> operator-(const vec2<T>& v) noexcept {
         return {
             -v.x,
             -v.y};
@@ -296,7 +296,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator+(const vec2<T>& l, T v) noexcept {
+    constexpr vec2<T> operator+(const vec2<T>& l, T v) noexcept {
         return {
             l.x + v,
             l.y + v};
@@ -304,7 +304,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator-(const vec2<T>& l, T v) noexcept {
+    constexpr vec2<T> operator-(const vec2<T>& l, T v) noexcept {
         return {
             l.x - v,
             l.y - v};
@@ -312,7 +312,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator*(const vec2<T>& l, T v) noexcept {
+    constexpr vec2<T> operator*(const vec2<T>& l, T v) noexcept {
         return {
             l.x * v,
             l.y * v};
@@ -320,7 +320,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator/(const vec2<T>& l, T v) noexcept {
+    constexpr vec2<T> operator/(const vec2<T>& l, T v) noexcept {
         E2D_ASSERT(!math::is_near_zero(v, T(0)));
         return {
             l.x / v,
@@ -333,7 +333,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator+(T v, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator+(T v, const vec2<T>& r) noexcept {
         return {
             v + r.x,
             v + r.y};
@@ -341,7 +341,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator-(T v, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator-(T v, const vec2<T>& r) noexcept {
         return {
             v - r.x,
             v - r.y};
@@ -349,7 +349,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator*(T v, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator*(T v, const vec2<T>& r) noexcept {
         return {
             v * r.x,
             v * r.y};
@@ -357,7 +357,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator/(T v, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator/(T v, const vec2<T>& r) noexcept {
         E2D_ASSERT(!math::is_near_zero(r.x, T(0)));
         E2D_ASSERT(!math::is_near_zero(r.y, T(0)));
         return {
@@ -371,7 +371,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator+(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator+(const vec2<T>& l, const vec2<T>& r) noexcept {
         return {
             l.x + r.x,
             l.y + r.y};
@@ -379,7 +379,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator-(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator-(const vec2<T>& l, const vec2<T>& r) noexcept {
         return {
             l.x - r.x,
             l.y - r.y};
@@ -387,7 +387,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator*(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator*(const vec2<T>& l, const vec2<T>& r) noexcept {
         return {
             l.x * r.x,
             l.y * r.y};
@@ -395,7 +395,7 @@ namespace e2d
 
     template < typename T >
     [[nodiscard]]
-    vec2<T> operator/(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr vec2<T> operator/(const vec2<T>& l, const vec2<T>& r) noexcept {
         E2D_ASSERT(!math::is_near_zero(r.x, T(0)));
         E2D_ASSERT(!math::is_near_zero(r.y, T(0)));
         return {
@@ -428,7 +428,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    T dot(const vec2<T>& l, const vec2<T>& r) noexcept {
+    constexpr T dot(const vec2<T>& l, const vec2<T>& r) noexcept {
         return
             l.x * r.x +
             l.y * r.y;
@@ -448,7 +448,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    T length_squared(const vec2<T>& v) noexcept {
+    constexpr T length_squared(const vec2<T>& v) noexcept {
         return dot(v, v);
     }
 
@@ -503,13 +503,13 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
-    T minimum(const vec2<T>& v) noexcept {
+    constexpr T minimum(const vec2<T>& v) noexcept {
         return math::min(v.x, v.y);
     }
 
     template < typename T >
     [[nodiscard]]
-    T maximum(const vec2<T>& v) noexcept {
+    constexpr T maximum(const vec2<T>& v) noexcept {
         return math::max(v.x, v.y);
     }
 
@@ -535,6 +535,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     vec2<T> clamped(const vec2<T>& v, const vec2<T>& vmin, const vec2<T>& vmax) noexcept {
         return {
             math::clamp(v.x, vmin.x, vmax.x),
@@ -543,6 +544,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     vec2<T> saturated(const vec2<T>& v) noexcept {
         return clamped(v, vec2<T>::zero(), vec2<T>::unit());
     }
@@ -553,6 +555,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_floating_point_v<T>, vec2<T>>
     lerp(const vec2<T>& l, const vec2<T>& r, T v) noexcept {
         return {
@@ -562,6 +565,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_floating_point_v<T>, vec2<T>>
     lerp(const vec2<T>& l, const vec2<T>& r, const vec2<T>& v) noexcept {
         return {
@@ -571,6 +575,7 @@ namespace e2d::math
 
     template < typename T >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<std::is_floating_point_v<T>, vec2<T>>
     inverse_lerp(const vec2<T>& l, const vec2<T>& r, const vec2<T>& v) noexcept {
         return {

@@ -92,7 +92,7 @@ namespace e2d
 
     template < typename T, typename AngleTag >
     [[nodiscard]]
-    trs2<T> make_trs2(
+    constexpr trs2<T> make_trs2(
         const vec2<T>& t,
         const unit<T, AngleTag>& r,
         const vec2<T>& s) noexcept
