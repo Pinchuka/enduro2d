@@ -34,9 +34,9 @@ namespace e2d
         void clear() noexcept;
         bool empty() const noexcept;
 
-        u8* data() noexcept;
-        const u8* data() const noexcept;
-        std::size_t size() const noexcept;
+        [[nodiscard]] u8* data() noexcept;
+        [[nodiscard]] const u8* data() const noexcept;
+        [[nodiscard]] std::size_t size() const noexcept;
     private:
         using data_t = std::unique_ptr<u8[]>;
         data_t data_;
@@ -44,7 +44,7 @@ namespace e2d
     };
 
     void swap(buffer& l, buffer& r) noexcept;
-    bool operator<(const buffer& l, const buffer& r) noexcept;
-    bool operator==(const buffer& l, const buffer& r) noexcept;
-    bool operator!=(const buffer& l, const buffer& r) noexcept;
+    [[nodiscard]] bool operator<(const buffer& l, const buffer& r) noexcept;
+    [[nodiscard]] bool operator==(const buffer& l, const buffer& r) noexcept;
+    [[nodiscard]] bool operator!=(const buffer& l, const buffer& r) noexcept;
 }

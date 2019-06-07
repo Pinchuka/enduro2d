@@ -5,67 +5,9 @@
  ******************************************************************************/
 
 #include <enduro2d/utils/color32.hpp>
-#include <enduro2d/utils/color.hpp>
 
 namespace e2d
 {
-    const color32& color32::clear() noexcept {
-        static const color32 c(0, 0, 0, 0);
-        return c;
-    }
-
-    const color32& color32::black() noexcept {
-        static const color32 c(0, 0, 0, 255);
-        return c;
-    }
-
-    const color32& color32::white() noexcept {
-        static const color32 c(255, 255, 255, 255);
-        return c;
-    }
-
-    const color32& color32::red() noexcept {
-        static const color32 c(255, 0, 0, 255);
-        return c;
-    }
-
-    const color32& color32::green() noexcept {
-        static const color32 c(0, 255, 0, 255);
-        return c;
-    }
-
-    const color32& color32::blue() noexcept {
-        static const color32 c(0, 0, 255, 255);
-        return c;
-    }
-
-    const color32& color32::yellow() noexcept {
-        static const color32 c(255, 255, 0, 255);
-        return c;
-    }
-
-    const color32& color32::magenta() noexcept {
-        static const color32 c(255, 0, 255, 255);
-        return c;
-    }
-
-    const color32& color32::cyan() noexcept {
-        static const color32 c(0, 255, 255, 255);
-        return c;
-    }
-
-    color32::color32(const color& other) noexcept
-    : r(math::numeric_cast<u8>(math::round(math::saturate(other.r) * 255.f)))
-    , g(math::numeric_cast<u8>(math::round(math::saturate(other.g) * 255.f)))
-    , b(math::numeric_cast<u8>(math::round(math::saturate(other.b) * 255.f)))
-    , a(math::numeric_cast<u8>(math::round(math::saturate(other.a) * 255.f))) {}
-
-    color32::color32(u8 nr, u8 ng, u8 nb, u8 na) noexcept
-    : r(nr)
-    , g(ng)
-    , b(nb)
-    , a(na) {}
-
     u8* color32::data() noexcept {
         return &r;
     }

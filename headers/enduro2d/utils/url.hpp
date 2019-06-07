@@ -34,10 +34,10 @@ namespace e2d
 
         void swap(url& other) noexcept;
         void clear() noexcept;
-        bool empty() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
 
-        const str& scheme() const noexcept;
-        const str& path() const noexcept;
+        [[nodiscard]] const str& scheme() const noexcept;
+        [[nodiscard]] const str& path() const noexcept;
 
         url& operator+=(str_view path);
         url& operator/=(str_view path);
@@ -50,11 +50,11 @@ namespace e2d
 namespace e2d
 {
     void swap(url& l, url& r) noexcept;
-    bool operator==(const url& l, const url& r) noexcept;
-    bool operator!=(const url& l, const url& r) noexcept;
+    [[nodiscard]] bool operator==(const url& l, const url& r) noexcept;
+    [[nodiscard]] bool operator!=(const url& l, const url& r) noexcept;
 
-    url operator+(const url& l, str_view r);
-    url operator/(const url& l, str_view r);
+    [[nodiscard]] url operator+(const url& l, str_view r);
+    [[nodiscard]] url operator/(const url& l, str_view r);
 }
 
 namespace std

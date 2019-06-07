@@ -32,11 +32,11 @@ namespace e2d
         module() noexcept = default;
         virtual ~module() noexcept = default;
 
-        const std::thread::id& main_thread() const noexcept {
+        [[nodiscard]] const std::thread::id& main_thread() const noexcept {
             return main_thread_;
         }
 
-        bool is_in_main_thread() const noexcept {
+        [[nodiscard]] bool is_in_main_thread() const noexcept {
             return std::this_thread::get_id() == main_thread_;
         }
     public:
@@ -53,10 +53,12 @@ namespace e2d
             instance_.reset();
         }
 
+        [[nodiscard]]
         static bool is_initialized() noexcept {
             return !!instance_;
         }
 
+        [[nodiscard]]
         static BaseT& instance() {
             if ( !is_initialized() ) {
                 throw module_not_initialized();

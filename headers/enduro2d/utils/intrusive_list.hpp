@@ -52,11 +52,11 @@ namespace e2d
         : prev_(prev)
         , next_(next) {}
 
-        bool unique() const noexcept {
+        [[nodiscard]] bool unique() const noexcept {
             return !next_ || next_ == this;
         }
 
-        bool is_linked() const noexcept {
+        [[nodiscard]] bool is_linked() const noexcept {
             return !unique();
         }
 
@@ -145,11 +145,11 @@ namespace e2d
         intrusive_list_iterator(const intrusive_list_iterator<Tag,T,UTP,UTR>& other) noexcept
         : node_(const_cast<node_ptr>(other.node_)) {}
 
-        node_ptr node() noexcept {
+        [[nodiscard]] node_ptr node() noexcept {
             return node_;
         }
 
-        const_node_ptr node() const noexcept {
+        [[nodiscard]] const_node_ptr node() const noexcept {
             return node_;
         }
 
@@ -175,12 +175,12 @@ namespace e2d
             return tmp;
         }
 
-        TR operator*() const noexcept {
+        [[nodiscard]] TR operator*() const noexcept {
             E2D_ASSERT(node_);
             return static_cast<TR>(*node_);
         }
 
-        TP operator->() const noexcept {
+        [[nodiscard]] TP operator->() const noexcept {
             E2D_ASSERT(node_);
             return static_cast<TP>(node_);
         }
@@ -189,6 +189,7 @@ namespace e2d
     };
 
     template < typename Tag, typename T, typename LTP, typename LTR, typename RTP, typename RTR >
+    [[nodiscard]]
     bool operator==(
         const intrusive_list_iterator<Tag,T,LTP,LTR>& l,
         const intrusive_list_iterator<Tag,T,RTP,RTR>& r) noexcept
@@ -197,6 +198,7 @@ namespace e2d
     }
 
     template < typename Tag, typename T, typename LTP, typename LTR, typename RTP, typename RTR >
+    [[nodiscard]]
     bool operator!=(
         const intrusive_list_iterator<Tag,T,LTP,LTR>& l,
         const intrusive_list_iterator<Tag,T,RTP,RTR>& r) noexcept
@@ -226,30 +228,30 @@ namespace e2d
         intrusive_list() = default;
         ~intrusive_list() noexcept;
 
-        iterator begin() noexcept;
-        const_iterator begin() const noexcept;
-        const_iterator cbegin() const noexcept;
+        [[nodiscard]] iterator begin() noexcept;
+        [[nodiscard]] const_iterator begin() const noexcept;
+        [[nodiscard]] const_iterator cbegin() const noexcept;
 
-        iterator end() noexcept;
-        const_iterator end() const noexcept;
-        const_iterator cend() const noexcept;
+        [[nodiscard]] iterator end() noexcept;
+        [[nodiscard]] const_iterator end() const noexcept;
+        [[nodiscard]] const_iterator cend() const noexcept;
 
-        reverse_iterator rbegin() noexcept;
-        const_reverse_iterator rbegin() const noexcept;
-        const_reverse_iterator crbegin() const noexcept;
+        [[nodiscard]] reverse_iterator rbegin() noexcept;
+        [[nodiscard]] const_reverse_iterator rbegin() const noexcept;
+        [[nodiscard]] const_reverse_iterator crbegin() const noexcept;
 
-        reverse_iterator rend() noexcept;
-        const_reverse_iterator rend() const noexcept;
-        const_reverse_iterator crend() const noexcept;
+        [[nodiscard]] reverse_iterator rend() noexcept;
+        [[nodiscard]] const_reverse_iterator rend() const noexcept;
+        [[nodiscard]] const_reverse_iterator crend() const noexcept;
 
-        T& back() noexcept;
-        const T& back() const noexcept;
+        [[nodiscard]] T& back() noexcept;
+        [[nodiscard]] const T& back() const noexcept;
 
-        T& front() noexcept;
-        const T& front() const noexcept;
+        [[nodiscard]] T& front() noexcept;
+        [[nodiscard]] const T& front() const noexcept;
 
-        std::size_t size() const noexcept;
-        bool empty() const noexcept;
+        [[nodiscard]] std::size_t size() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
         void swap(intrusive_list& other) noexcept;
 
         template < typename Disposer >

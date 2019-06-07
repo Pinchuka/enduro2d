@@ -22,14 +22,14 @@ namespace e2d
     public:
         T value = 0;
     public:
-        unit() noexcept = default;
-        unit(const unit& other) noexcept = default;
+        constexpr unit() noexcept = default;
+        constexpr unit(const unit& other) noexcept = default;
         unit& operator=(const unit& other) noexcept = default;
 
-        explicit unit(T v) noexcept;
-        unit(T v, Tag tag) noexcept;
+        constexpr explicit unit(T v) noexcept;
+        constexpr unit(T v, Tag tag) noexcept;
         template < typename OtherTag >
-        explicit unit(const unit<T, OtherTag>& other) noexcept;
+        constexpr explicit unit(const unit<T, OtherTag>& other) noexcept;
 
         template < typename To >
         unit<To, Tag> cast_to() const noexcept;
@@ -37,11 +37,11 @@ namespace e2d
         template < typename OtherTag >
         unit<T, OtherTag> convert_to() const noexcept;
 
-        unit& operator*=(T v) noexcept;
-        unit& operator/=(T v) noexcept;
+        constexpr unit& operator*=(T v) noexcept;
+        constexpr unit& operator/=(T v) noexcept;
 
-        unit& operator+=(const unit& other) noexcept;
-        unit& operator-=(const unit& other) noexcept;
+        constexpr unit& operator+=(const unit& other) noexcept;
+        constexpr unit& operator-=(const unit& other) noexcept;
     };
 
     template < typename FromTag, typename ToTag >
@@ -50,6 +50,7 @@ namespace e2d
     template < typename Tag >
     struct unit_converter<Tag, Tag> {
         template < typename T >
+        [[nodiscard]]
         unit<T, Tag> operator()(const unit<T, Tag>& u) const noexcept {
             return u;
         }
@@ -59,16 +60,16 @@ namespace e2d
 namespace e2d
 {
     template < typename T, typename Tag >
-    unit<T, Tag>::unit(T v) noexcept
+    constexpr unit<T, Tag>::unit(T v) noexcept
     : value(v) {}
 
     template < typename T, typename Tag >
-    unit<T, Tag>::unit(T v, Tag tag) noexcept
+    constexpr unit<T, Tag>::unit(T v, Tag tag) noexcept
     : value(v) { E2D_UNUSED(tag); }
 
     template < typename T, typename Tag >
     template < typename OtherTag >
-    unit<T, Tag>::unit(const unit<T, OtherTag>& other) noexcept
+    constexpr unit<T, Tag>::unit(const unit<T, OtherTag>& other) noexcept
     : value(other.template convert_to<Tag>().value) {}
 
     template < typename T, typename Tag >
@@ -86,26 +87,26 @@ namespace e2d
     }
 
     template < typename T, typename Tag >
-    unit<T, Tag>& unit<T, Tag>::operator*=(T v) noexcept {
+    constexpr unit<T, Tag>& unit<T, Tag>::operator*=(T v) noexcept {
         value *= v;
         return *this;
     }
 
     template < typename T, typename Tag >
-    unit<T, Tag>& unit<T, Tag>::operator/=(T v) noexcept {
+    constexpr unit<T, Tag>& unit<T, Tag>::operator/=(T v) noexcept {
         E2D_ASSERT(!math::is_near_zero(v, T(0)));
         value /= v;
         return *this;
     }
 
     template < typename T, typename Tag >
-    unit<T, Tag>& unit<T, Tag>::operator+=(const unit& other) noexcept {
+    constexpr unit<T, Tag>& unit<T, Tag>::operator+=(const unit& other) noexcept {
         value += other.value;
         return *this;
     }
 
     template < typename T, typename Tag >
-    unit<T, Tag>& unit<T, Tag>::operator-=(const unit& other) noexcept {
+    constexpr unit<T, Tag>& unit<T, Tag>::operator-=(const unit& other) noexcept {
         value -= other.value;
         return *this;
     }
@@ -129,13 +130,13 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    bool operator==(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr bool operator==(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return math::approximately(l.value, r.value);
     }
 
     template < typename T, typename Tag  >
     [[nodiscard]]
-    bool operator!=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr bool operator!=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return !(l == r);
     }
 
@@ -145,25 +146,25 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    bool operator<(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr bool operator<(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value < r.value;
     }
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    bool operator>(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr bool operator>(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value > r.value;
     }
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    bool operator<=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr bool operator<=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value <= r.value;
     }
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    bool operator>=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr bool operator>=(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return l.value >= r.value;
     }
 
@@ -173,7 +174,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator-(const unit<T, Tag>& u) noexcept {
+    constexpr unit<T, Tag> operator-(const unit<T, Tag>& u) noexcept {
         return {
             -u.value,
             Tag{}};
@@ -185,7 +186,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator*(const unit<T, Tag>& l, T v) noexcept {
+    constexpr unit<T, Tag> operator*(const unit<T, Tag>& l, T v) noexcept {
         return {
             l.value * v,
             Tag{}};
@@ -193,7 +194,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator/(const unit<T, Tag>& l, T v) noexcept {
+    constexpr unit<T, Tag> operator/(const unit<T, Tag>& l, T v) noexcept {
         E2D_ASSERT(!math::is_near_zero(v, T(0)));
         return {
             l.value / v,
@@ -206,7 +207,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator*(T v, const unit<T, Tag>& r) noexcept {
+    constexpr unit<T, Tag> operator*(T v, const unit<T, Tag>& r) noexcept {
         return {
             v * r.value,
             Tag{}};
@@ -214,7 +215,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator/(T v, const unit<T, Tag>& r) noexcept {
+    constexpr unit<T, Tag> operator/(T v, const unit<T, Tag>& r) noexcept {
         E2D_ASSERT(!math::approximately(r.value, T(0), T(0)));
         return {
             v / r.value,
@@ -227,7 +228,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator+(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr unit<T, Tag> operator+(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return {
             l.value + r.value,
             Tag{}};
@@ -235,7 +236,7 @@ namespace e2d
 
     template < typename T, typename Tag >
     [[nodiscard]]
-    unit<T, Tag> operator-(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
+    constexpr unit<T, Tag> operator-(const unit<T, Tag>& l, const unit<T, Tag>& r) noexcept {
         return {
             l.value - r.value,
             Tag{}};

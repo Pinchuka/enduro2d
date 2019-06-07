@@ -9,6 +9,10 @@ using namespace e2d;
 
 TEST_CASE("color") {
     {
+        constexpr color c = color::white();
+        static_assert(c.r == 1.0f && c.g == 1.0f && c.b == 1.0f && c.a == 1.0f);
+    }
+    {
         REQUIRE(color() == color::white());
         REQUIRE(color(color::black()) == color::black());
         REQUIRE(color(color32::yellow()) == color::yellow());

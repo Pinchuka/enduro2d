@@ -36,7 +36,7 @@ namespace e2d
 
         void swap(mesh& other) noexcept;
         void clear() noexcept;
-        bool empty() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
 
         mesh& set_uvs(std::size_t channel, vector<v2f>&& uvs);
         mesh& set_uvs(std::size_t channel, const vector<v2f>& uvs);
@@ -66,20 +66,20 @@ namespace e2d
         mesh& set_bitangents(const vector<v3f>& bitangents);
         mesh& set_bitangents(const v3f* bitangents, std::size_t count);
 
-        const vector<v2f>& uvs(std::size_t channel) const;
-        std::size_t uvs_channel_count() const noexcept;
+        [[nodiscard]] const vector<v2f>& uvs(std::size_t channel) const;
+        [[nodiscard]] std::size_t uvs_channel_count() const noexcept;
 
-        const vector<color32>& colors(std::size_t channel) const;
-        std::size_t colors_channel_count() const noexcept;
+        [[nodiscard]] const vector<color32>& colors(std::size_t channel) const;
+        [[nodiscard]] std::size_t colors_channel_count() const noexcept;
 
-        const vector<v3f>& vertices() const noexcept;
+        [[nodiscard]] const vector<v3f>& vertices() const noexcept;
 
-        const vector<u32>& indices(std::size_t submesh) const;
-        std::size_t indices_submesh_count() const noexcept;
+        [[nodiscard]] const vector<u32>& indices(std::size_t submesh) const;
+        [[nodiscard]] std::size_t indices_submesh_count() const noexcept;
 
-        const vector<v3f>& normals() const noexcept;
-        const vector<v3f>& tangents() const noexcept;
-        const vector<v3f>& bitangents() const noexcept;
+        [[nodiscard]] const vector<v3f>& normals() const noexcept;
+        [[nodiscard]] const vector<v3f>& tangents() const noexcept;
+        [[nodiscard]] const vector<v3f>& bitangents() const noexcept;
     private:
         vector<vector<v2f>> uvs_channels_;
         vector<vector<color32>> colors_channels_;
@@ -93,8 +93,8 @@ namespace e2d
     };
 
     void swap(mesh& l, mesh& r) noexcept;
-    bool operator==(const mesh& l, const mesh& r) noexcept;
-    bool operator!=(const mesh& l, const mesh& r) noexcept;
+    [[nodiscard]] bool operator==(const mesh& l, const mesh& r) noexcept;
+    [[nodiscard]] bool operator!=(const mesh& l, const mesh& r) noexcept;
 }
 
 namespace e2d::meshes

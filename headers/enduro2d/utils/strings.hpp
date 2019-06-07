@@ -32,12 +32,12 @@ namespace e2d
 
         void swap(basic_string_hash& other) noexcept;
         void clear() noexcept;
-        bool empty() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
 
-        u32 hash() const noexcept;
+        [[nodiscard]] u32 hash() const noexcept;
     private:
-        static u32 empty_hash() noexcept;
-        static u32 calculate_hash(basic_string_view<Char> str) noexcept;
+        [[nodiscard]] static u32 empty_hash() noexcept;
+        [[nodiscard]] static u32 calculate_hash(basic_string_view<Char> str) noexcept;
         static void debug_check_collisions(u32 hash, basic_string_view<Char> str) noexcept;
     private:
         u32 hash_ = empty_hash();
@@ -47,41 +47,41 @@ namespace e2d
     void swap(basic_string_hash<Char>& l, basic_string_hash<Char>& r) noexcept;
 
     template < typename Char >
-    bool operator<(basic_string_hash<Char> l, basic_string_hash<Char> r) noexcept;
+    [[nodiscard]] bool operator<(basic_string_hash<Char> l, basic_string_hash<Char> r) noexcept;
 
     template < typename Char >
-    bool operator==(basic_string_hash<Char> l, basic_string_hash<Char> r) noexcept;
+    [[nodiscard]] bool operator==(basic_string_hash<Char> l, basic_string_hash<Char> r) noexcept;
 
     template < typename Char >
-    bool operator!=(basic_string_hash<Char> l, basic_string_hash<Char> r) noexcept;
+    [[nodiscard]] bool operator!=(basic_string_hash<Char> l, basic_string_hash<Char> r) noexcept;
 }
 
 namespace e2d
 {
-    str make_utf8(str_view src);
-    str make_utf8(wstr_view src);
-    str make_utf8(str16_view src);
-    str make_utf8(str32_view src);
+    [[nodiscard]] str make_utf8(str_view src);
+    [[nodiscard]] str make_utf8(wstr_view src);
+    [[nodiscard]] str make_utf8(str16_view src);
+    [[nodiscard]] str make_utf8(str32_view src);
 
-    wstr make_wide(str_view src);
-    wstr make_wide(wstr_view src);
-    wstr make_wide(str16_view src);
-    wstr make_wide(str32_view src);
+    [[nodiscard]] wstr make_wide(str_view src);
+    [[nodiscard]] wstr make_wide(wstr_view src);
+    [[nodiscard]] wstr make_wide(str16_view src);
+    [[nodiscard]] wstr make_wide(str32_view src);
 
-    str16 make_utf16(str_view src);
-    str16 make_utf16(wstr_view src);
-    str16 make_utf16(str16_view src);
-    str16 make_utf16(str32_view src);
+    [[nodiscard]] str16 make_utf16(str_view src);
+    [[nodiscard]] str16 make_utf16(wstr_view src);
+    [[nodiscard]] str16 make_utf16(str16_view src);
+    [[nodiscard]] str16 make_utf16(str32_view src);
 
-    str32 make_utf32(str_view src);
-    str32 make_utf32(wstr_view src);
-    str32 make_utf32(str16_view src);
-    str32 make_utf32(str32_view src);
+    [[nodiscard]] str32 make_utf32(str_view src);
+    [[nodiscard]] str32 make_utf32(wstr_view src);
+    [[nodiscard]] str32 make_utf32(str16_view src);
+    [[nodiscard]] str32 make_utf32(str32_view src);
 
-    str_hash make_hash(str_view src) noexcept;
-    wstr_hash make_hash(wstr_view src) noexcept;
-    str16_hash make_hash(str16_view src) noexcept;
-    str32_hash make_hash(str32_view src) noexcept;
+    [[nodiscard]] str_hash make_hash(str_view src) noexcept;
+    [[nodiscard]] wstr_hash make_hash(wstr_view src) noexcept;
+    [[nodiscard]] str16_hash make_hash(str16_view src) noexcept;
+    [[nodiscard]] str32_hash make_hash(str32_view src) noexcept;
 }
 
 namespace e2d::strings
@@ -118,8 +118,8 @@ namespace e2d::strings
 
     bool wildcard_match(str_view string, str_view pattern);
 
-    bool starts_with(str_view input, str_view test) noexcept;
-    bool ends_with(str_view input, str_view test) noexcept;
+    [[nodiscard]] bool starts_with(str_view input, str_view test) noexcept;
+    [[nodiscard]] bool ends_with(str_view input, str_view test) noexcept;
 }
 
 #include "strings.inl"

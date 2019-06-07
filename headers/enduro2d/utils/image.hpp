@@ -72,16 +72,16 @@ namespace e2d
 
         void swap(image& other) noexcept;
         void clear() noexcept;
-        bool empty() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
 
-        color pixel(u32 u, u32 v) const;
-        color pixel(const v2u& uv) const;
-        color32 pixel32(u32 u, u32 v) const;
-        color32 pixel32(const v2u& uv) const;
+        [[nodiscard]] color pixel(u32 u, u32 v) const;
+        [[nodiscard]] color pixel(const v2u& uv) const;
+        [[nodiscard]] color32 pixel32(u32 u, u32 v) const;
+        [[nodiscard]] color32 pixel32(const v2u& uv) const;
 
-        const v2u& size() const noexcept;
-        image_data_format format() const noexcept;
-        const buffer& data() const noexcept;
+        [[nodiscard]] const v2u& size() const noexcept;
+        [[nodiscard]] image_data_format format() const noexcept;
+        [[nodiscard]] const buffer& data() const noexcept;
     private:
         buffer data_;
         v2u size_;
@@ -89,8 +89,8 @@ namespace e2d
     };
 
     void swap(image& l, image& r) noexcept;
-    bool operator==(const image& l, const image& r) noexcept;
-    bool operator!=(const image& l, const image& r) noexcept;
+    [[nodiscard]] bool operator==(const image& l, const image& r) noexcept;
+    [[nodiscard]] bool operator!=(const image& l, const image& r) noexcept;
 }
 
 namespace e2d::images

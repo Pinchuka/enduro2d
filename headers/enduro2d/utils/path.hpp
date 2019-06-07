@@ -10,19 +10,19 @@
 
 namespace e2d::path
 {
-    str combine(str_view lhs, str_view rhs);
+    [[nodiscard]] str combine(str_view lhs, str_view rhs);
 
-    str remove_filename(str_view path);
-    str remove_extension(str_view path);
+    [[nodiscard]] str remove_filename(str_view path);
+    [[nodiscard]] str remove_extension(str_view path);
 
-    str replace_filename(str_view path, str_view filename);
-    str replace_extension(str_view path, str_view extension);
+    [[nodiscard]] str replace_filename(str_view path, str_view filename);
+    [[nodiscard]] str replace_extension(str_view path, str_view extension);
 
-    str stem(str_view path);
-    str filename(str_view path);
-    str extension(str_view path);
-    str parent_path(str_view path);
+    [[nodiscard]] str stem(str_view path);
+    [[nodiscard]] str filename(str_view path);
+    [[nodiscard]] str extension(str_view path);
+    [[nodiscard]] str parent_path(str_view path);
 
-    bool is_absolute(str_view path) noexcept;
-    bool is_relative(str_view path) noexcept;
+    [[nodiscard]] bool is_absolute(str_view path) noexcept;
+    [[nodiscard]] bool is_relative(str_view path) noexcept;
 }

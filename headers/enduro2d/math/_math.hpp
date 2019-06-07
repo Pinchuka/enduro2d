@@ -208,6 +208,7 @@ namespace e2d::math
     {
         // i -> i, u -> u, f -> f
         template < typename To, typename From >
+        constexpr
         std::enable_if_t<
             std::is_signed_v<From> == std::is_signed_v<To> &&
             std::is_integral_v<From> == std::is_integral_v<To> &&
@@ -224,6 +225,7 @@ namespace e2d::math
 
         // i/u -> f
         template < typename To, typename From >
+        constexpr
         std::enable_if_t<
             std::is_integral_v<From> && std::is_floating_point_v<To>,
             bool>
@@ -234,6 +236,7 @@ namespace e2d::math
 
         // f -> i/u
         template < typename To, typename From >
+        constexpr
         std::enable_if_t<
             std::is_floating_point_v<From> && std::is_integral_v<To>,
             bool>
@@ -246,6 +249,7 @@ namespace e2d::math
 
         // i -> u
         template < typename To, typename From >
+        constexpr
         std::enable_if_t<
             std::is_signed_v<From> && std::is_unsigned_v<To> &&
             std::is_integral_v<From> && std::is_integral_v<To>,
@@ -257,6 +261,7 @@ namespace e2d::math
 
         // u -> i
         template < typename To, typename From >
+        constexpr
         std::enable_if_t<
             std::is_unsigned_v<From> && std::is_signed_v<To> &&
             std::is_integral_v<From> && std::is_integral_v<To>,
@@ -269,6 +274,7 @@ namespace e2d::math
 
     template < typename To, typename From >
     [[nodiscard]]
+    constexpr
     std::enable_if_t<
         std::is_arithmetic_v<From> && std::is_arithmetic_v<To>,
         To>

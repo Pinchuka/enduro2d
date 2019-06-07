@@ -16,7 +16,7 @@ namespace e2d
 
     class read_file : public input_stream {
     public:
-        virtual const str& path() const noexcept = 0;
+        [[nodiscard]] virtual const str& path() const noexcept = 0;
     };
 
     class write_file;
@@ -24,14 +24,14 @@ namespace e2d
 
     class write_file : public output_stream {
     public:
-        virtual const str& path() const noexcept = 0;
+        [[nodiscard]] virtual const str& path() const noexcept = 0;
     };
 }
 
 namespace e2d
 {
-    read_file_uptr make_read_file(str_view path) noexcept;
-    write_file_uptr make_write_file(str_view path, bool append) noexcept;
+    [[nodiscard]] read_file_uptr make_read_file(str_view path) noexcept;
+    [[nodiscard]] write_file_uptr make_write_file(str_view path, bool append) noexcept;
 }
 
 namespace e2d::filesystem
@@ -42,8 +42,8 @@ namespace e2d::filesystem
     bool remove_file(str_view path);
     bool remove_directory(str_view path);
 
-    bool file_exists(str_view path);
-    bool directory_exists(str_view path);
+    [[nodiscard]] bool file_exists(str_view path);
+    [[nodiscard]] bool directory_exists(str_view path);
 
     bool create_file(str_view path);
     bool create_directory(str_view path);

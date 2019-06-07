@@ -9,63 +9,6 @@
 
 namespace e2d
 {
-    const color& color::clear() noexcept {
-        static const color c(0, 0, 0, 0);
-        return c;
-    }
-
-    const color& color::black() noexcept {
-        static const color c(0, 0, 0, 1);
-        return c;
-    }
-
-    const color& color::white() noexcept {
-        static const color c(1, 1, 1, 1);
-        return c;
-    }
-
-    const color& color::red() noexcept {
-        static const color c(1, 0, 0, 1);
-        return c;
-    }
-
-    const color& color::green() noexcept {
-        static const color c(0, 1, 0, 1);
-        return c;
-    }
-
-    const color& color::blue() noexcept {
-        static const color c(0, 0, 1, 1);
-        return c;
-    }
-
-    const color& color::yellow() noexcept {
-        static const color c(1, 1, 0, 1);
-        return c;
-    }
-
-    const color& color::magenta() noexcept {
-        static const color c(1, 0, 1, 1);
-        return c;
-    }
-
-    const color& color::cyan() noexcept {
-        static const color c(0, 1, 1, 1);
-        return c;
-    }
-
-    color::color(const color32& other) noexcept
-    : r(other.r / 255.f)
-    , g(other.g / 255.f)
-    , b(other.b / 255.f)
-    , a(other.a / 255.f) {}
-
-    color::color(f32 nr, f32 ng, f32 nb, f32 na) noexcept
-    : r(nr)
-    , g(ng)
-    , b(nb)
-    , a(na) {}
-
     f32* color::data() noexcept {
         return &r;
     }

@@ -117,34 +117,34 @@ namespace e2d::utils
     }
 
     template < typename Char >
-    u32 sdbm_hash(const Char* str) noexcept {
+    [[nodiscard]] u32 sdbm_hash(const Char* str) noexcept {
         E2D_ASSERT(str);
         return impl::sdbm_hash_impl(0u, str);
     }
 
     template < typename Char, typename Traits >
-    u32 sdbm_hash(basic_string_view<Char, Traits> str) noexcept {
+    [[nodiscard]] u32 sdbm_hash(basic_string_view<Char, Traits> str) noexcept {
         return impl::sdbm_hash_impl(0u, str.cbegin(), str.cend());
     }
 
     template < typename Iter >
-    u32 sdbm_hash(Iter first, Iter last) noexcept {
+    [[nodiscard]] u32 sdbm_hash(Iter first, Iter last) noexcept {
         return impl::sdbm_hash_impl(0u, first, last);
     }
 
     template < typename Char >
-    u32 sdbm_hash(u32 init, const Char* str) noexcept {
+    [[nodiscard]] u32 sdbm_hash(u32 init, const Char* str) noexcept {
         E2D_ASSERT(str);
         return impl::sdbm_hash_impl(init, str);
     }
 
     template < typename Char, typename Traits >
-    u32 sdbm_hash(u32 init, basic_string_view<Char, Traits> str) noexcept {
+    [[nodiscard]] u32 sdbm_hash(u32 init, basic_string_view<Char, Traits> str) noexcept {
         return impl::sdbm_hash_impl(init, str.cbegin(), str.cend());
     }
 
     template < typename Iter >
-    u32 sdbm_hash(u32 init, Iter first, Iter last) noexcept {
+    [[nodiscard]] u32 sdbm_hash(u32 init, Iter first, Iter last) noexcept {
         return impl::sdbm_hash_impl(init, first, last);
     }
 
@@ -152,7 +152,7 @@ namespace e2d::utils
     // hash_combine
     //
 
-    inline std::size_t hash_combine(std::size_t l, std::size_t r) noexcept {
+    [[nodiscard]] inline std::size_t hash_combine(std::size_t l, std::size_t r) noexcept {
         return l ^ (r + 0x9e3779b9 + (l << 6) + (l >> 2));
     }
 
@@ -162,7 +162,7 @@ namespace e2d::utils
 
     template < typename E
              , typename = std::enable_if<std::is_enum_v<E>> >
-    constexpr std::underlying_type_t<E> enum_to_underlying(E e) noexcept {
+    [[nodiscard]] constexpr std::underlying_type_t<E> enum_to_underlying(E e) noexcept {
         return static_cast<std::underlying_type_t<E>>(e);
     }
 

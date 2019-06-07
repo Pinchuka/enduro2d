@@ -23,10 +23,10 @@ namespace e2d
     class input_stream : private noncopyable {
     public:
         virtual ~input_stream() noexcept = default;
-        virtual std::size_t read(void* dst, std::size_t size) = 0;
-        virtual std::size_t seek(std::ptrdiff_t offset, bool relative) = 0;
-        virtual std::size_t tell() const = 0;
-        virtual std::size_t length() const noexcept = 0;
+        [[nodiscard]] virtual std::size_t read(void* dst, std::size_t size) = 0;
+        [[nodiscard]] virtual std::size_t seek(std::ptrdiff_t offset, bool relative) = 0;
+        [[nodiscard]] virtual std::size_t tell() const = 0;
+        [[nodiscard]] virtual std::size_t length() const noexcept = 0;
     };
 
     class output_stream;
@@ -35,9 +35,9 @@ namespace e2d
     class output_stream : private noncopyable {
     public:
         virtual ~output_stream() noexcept = default;
-        virtual std::size_t write(const void* src, std::size_t size) = 0;
-        virtual std::size_t seek(std::ptrdiff_t offset, bool relative) = 0;
-        virtual std::size_t tell() const = 0;
+        [[nodiscard]] virtual std::size_t write(const void* src, std::size_t size) = 0;
+        [[nodiscard]] virtual std::size_t seek(std::ptrdiff_t offset, bool relative) = 0;
+        [[nodiscard]] virtual std::size_t tell() const = 0;
         virtual void flush() const = 0;
     };
 }

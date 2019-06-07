@@ -9,6 +9,10 @@ using namespace e2d;
 
 TEST_CASE("time") {
     {
+        constexpr auto one_second_u32 = time::second<i32>().value;
+        static_assert(one_second_u32 == 1);
+    }
+    {
         REQUIRE(time::second<i32>().value == 1);
         REQUIRE(time::second_ms<i32>().value == 1000);
         REQUIRE(time::second_us<i32>().value == 1'000'000);

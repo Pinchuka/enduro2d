@@ -36,7 +36,7 @@ namespace e2d
 
         void swap(shape& other) noexcept;
         void clear() noexcept;
-        bool empty() const noexcept;
+        [[nodiscard]] bool empty() const noexcept;
 
         shape& set_uvs(std::size_t channel, vector<v2f>&& uvs);
         shape& set_uvs(std::size_t channel, const vector<v2f>& uvs);
@@ -54,16 +54,16 @@ namespace e2d
         shape& set_indices(std::size_t subshape, const vector<u32>& indices);
         shape& set_indices(std::size_t subshape, const u32* indices, std::size_t count);
 
-        const vector<v2f>& uvs(std::size_t channel) const;
-        std::size_t uvs_channel_count() const noexcept;
+        [[nodiscard]] const vector<v2f>& uvs(std::size_t channel) const;
+        [[nodiscard]] std::size_t uvs_channel_count() const noexcept;
 
-        const vector<color32>& colors(std::size_t channel) const;
-        std::size_t colors_channel_count() const noexcept;
+        [[nodiscard]] const vector<color32>& colors(std::size_t channel) const;
+        [[nodiscard]] std::size_t colors_channel_count() const noexcept;
 
-        const vector<v2f>& vertices() const noexcept;
+        [[nodiscard]] const vector<v2f>& vertices() const noexcept;
 
-        const vector<u32>& indices(std::size_t subshape) const;
-        std::size_t indices_subshape_count() const noexcept;
+        [[nodiscard]] const vector<u32>& indices(std::size_t subshape) const;
+        [[nodiscard]] std::size_t indices_subshape_count() const noexcept;
     private:
         vector<vector<v2f>> uvs_channels_;
         vector<vector<color32>> colors_channels_;
@@ -73,8 +73,8 @@ namespace e2d
     };
 
     void swap(shape& l, shape& r) noexcept;
-    bool operator==(const shape& l, const shape& r) noexcept;
-    bool operator!=(const shape& l, const shape& r) noexcept;
+    [[nodiscard]] bool operator==(const shape& l, const shape& r) noexcept;
+    [[nodiscard]] bool operator!=(const shape& l, const shape& r) noexcept;
 }
 
 namespace e2d::shapes

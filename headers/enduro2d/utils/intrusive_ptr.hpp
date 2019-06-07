@@ -156,12 +156,12 @@ namespace e2d
         void reset(T* other) noexcept(is_nothrow_counter_v);
         void reset(T* other, bool add_ref) noexcept(is_nothrow_counter_v);
 
-        T* get() const noexcept;
-        T* release() noexcept;
+        [[nodiscard]] T* get() const noexcept;
+        [[nodiscard]] T* release() noexcept;
 
-        T& operator*() const noexcept;
-        T* operator->() const noexcept;
-        explicit operator bool() const noexcept;
+        [[nodiscard]] T& operator*() const noexcept;
+        [[nodiscard]] T* operator->() const noexcept;
+        [[nodiscard]] explicit operator bool() const noexcept;
 
         void swap(intrusive_ptr<T>& other) noexcept;
     private:
