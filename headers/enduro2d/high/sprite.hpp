@@ -33,9 +33,9 @@ namespace e2d
         sprite& set_texrect(const b2f& texrect) noexcept;
         sprite& set_texture(const texture_asset::ptr& texture) noexcept;
 
-        const v2f& pivot() const noexcept;
-        const b2f& texrect() const noexcept;
-        const texture_asset::ptr& texture() const noexcept;
+        [[nodiscard]] const v2f& pivot() const noexcept;
+        [[nodiscard]] const b2f& texrect() const noexcept;
+        [[nodiscard]] const texture_asset::ptr& texture() const noexcept;
     private:
         v2f pivot_;
         b2f texrect_;

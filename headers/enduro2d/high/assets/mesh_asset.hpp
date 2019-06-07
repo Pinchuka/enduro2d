@@ -14,7 +14,7 @@ namespace e2d
 {
     class mesh_asset final : public content_asset<mesh_asset, mesh> {
     public:
-        static const char* type_name() noexcept { return "mesh_asset"; }
-        static load_async_result load_async(const library& library, str_view address);
+        [[nodiscard]] static const char* type_name() noexcept { return "mesh_asset"; }
+        [[nodiscard]] static load_async_result load_async(const library& library, str_view address);
     };
 }

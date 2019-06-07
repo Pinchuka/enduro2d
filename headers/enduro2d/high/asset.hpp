@@ -36,7 +36,7 @@ namespace e2d
     public:
         asset() = default;
         virtual ~asset() noexcept = default;
-        virtual asset_ptr find_nested_asset(str_view nested_address) const noexcept = 0;
+        [[nodiscard]] virtual asset_ptr find_nested_asset(str_view nested_address) const noexcept = 0;
     };
 
     //
@@ -79,7 +79,7 @@ namespace e2d
         asset_cache_base() = default;
         virtual ~asset_cache_base() noexcept = default;
 
-        virtual std::size_t asset_count() const noexcept = 0;
+        [[nodiscard]] virtual std::size_t asset_count() const noexcept = 0;
         virtual std::size_t unload_unused_assets() noexcept = 0;
     };
 
@@ -95,7 +95,7 @@ namespace e2d
         typed_asset_cache() = default;
         ~typed_asset_cache() noexcept final = default;
 
-        asset_ptr find(str_hash address) const noexcept;
+        [[nodiscard]] asset_ptr find(str_hash address) const noexcept;
         void store(str_hash address, const asset_ptr& asset);
 
         std::size_t asset_count() const noexcept override;
@@ -117,11 +117,11 @@ namespace e2d
         void store(str_hash address, const typename Asset::ptr& asset);
 
         template < typename Asset >
-        typename Asset::ptr find(str_hash address) const noexcept;
+        [[nodiscard]] typename Asset::ptr find(str_hash address) const noexcept;
 
         template < typename Asset >
-        std::size_t asset_count() const noexcept;
-        std::size_t asset_count() const noexcept;
+        [[nodiscard]] std::size_t asset_count() const noexcept;
+        [[nodiscard]] std::size_t asset_count() const noexcept;
 
         std::size_t unload_unused_assets() noexcept;
     private:

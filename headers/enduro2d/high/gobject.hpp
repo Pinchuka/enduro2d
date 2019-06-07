@@ -25,15 +25,15 @@ namespace e2d
         gobject(ecs::registry& registry, const ecs::prototype& proto);
         ~gobject() noexcept;
 
-        ecs::entity entity() noexcept;
-        ecs::const_entity entity() const noexcept;
-        ecs::entity_filler entity_filler() noexcept;
+        [[nodiscard]] ecs::entity entity() noexcept;
+        [[nodiscard]] ecs::const_entity entity() const noexcept;
+        [[nodiscard]] ecs::entity_filler entity_filler() noexcept;
 
         template < typename T >
-        ecs::component<T> get_component() noexcept;
+        [[nodiscard]] ecs::component<T> get_component() noexcept;
 
         template < typename T >
-        ecs::const_component<T> get_component() const noexcept;
+        [[nodiscard]] ecs::const_component<T> get_component() const noexcept;
     private:
         ecs::entity entity_;
     };

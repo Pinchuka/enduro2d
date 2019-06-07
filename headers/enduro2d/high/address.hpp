@@ -10,6 +10,6 @@
 
 namespace e2d::address
 {
-    str parent(str_view address);
-    str nested(str_view address);
+    [[nodiscard]] str parent(str_view address);
+    [[nodiscard]] str nested(str_view address);
 }

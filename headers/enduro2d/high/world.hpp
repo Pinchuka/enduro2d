@@ -32,15 +32,15 @@ namespace e2d
         world() = default;
         ~world() noexcept final;
 
-        ecs::registry& registry() noexcept;
-        const ecs::registry& registry() const noexcept;
+        [[nodiscard]] ecs::registry& registry() noexcept;
+        [[nodiscard]] const ecs::registry& registry() const noexcept;
 
-        gobject_iptr instantiate();
-        gobject_iptr instantiate(const prefab& prefab);
+        [[nodiscard]] gobject_iptr instantiate();
+        [[nodiscard]] gobject_iptr instantiate(const prefab& prefab);
         void destroy_instance(const gobject_iptr& inst) noexcept;
 
-        gobject_iptr resolve(ecs::entity_id ent) const noexcept;
-        gobject_iptr resolve(const ecs::const_entity& ent) const noexcept;
+        [[nodiscard]] gobject_iptr resolve(ecs::entity_id ent) const noexcept;
+        [[nodiscard]] gobject_iptr resolve(const ecs::const_entity& ent) const noexcept;
     private:
         ecs::registry registry_;
         hash_map<ecs::entity_id, gobject_iptr> gobjects_;

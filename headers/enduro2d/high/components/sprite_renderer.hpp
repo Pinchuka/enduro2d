@@ -20,13 +20,13 @@ namespace e2d
         sprite_renderer(const sprite_asset::ptr& sprite);
 
         sprite_renderer& tint(const color32& value) noexcept;
-        const color32& tint() const noexcept;
+        [[nodiscard]] const color32& tint() const noexcept;
 
         sprite_renderer& filtering(bool value) noexcept;
-        bool filtering() const noexcept;
+        [[nodiscard]] bool filtering() const noexcept;
 
         sprite_renderer& sprite(const sprite_asset::ptr& value) noexcept;
-        const sprite_asset::ptr& sprite() const noexcept;
+        [[nodiscard]] const sprite_asset::ptr& sprite() const noexcept;
     private:
         color32 tint_ = color32::white();
         bool filtering_ = true;

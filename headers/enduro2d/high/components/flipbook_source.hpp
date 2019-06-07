@@ -19,7 +19,7 @@ namespace e2d
         flipbook_source(const flipbook_asset::ptr& flipbook);
 
         flipbook_source& flipbook(const flipbook_asset::ptr& value) noexcept;
-        const flipbook_asset::ptr& flipbook() const noexcept;
+        [[nodiscard]] const flipbook_asset::ptr& flipbook() const noexcept;
     private:
         flipbook_asset::ptr flipbook_;
     };

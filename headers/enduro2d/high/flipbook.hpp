@@ -42,14 +42,14 @@ namespace e2d
         flipbook& set_frames(vector<frame>&& frames) noexcept;
         flipbook& set_frames(const vector<frame>& frames);
 
-        const vector<frame>& frames() const noexcept;
-        const frame* find_frame(std::size_t index) const noexcept;
+        [[nodiscard]] const vector<frame>& frames() const noexcept;
+        [[nodiscard]] const frame* find_frame(std::size_t index) const noexcept;
 
         flipbook& set_sequences(vector<sequence>&& sequences) noexcept;
         flipbook& set_sequences(const vector<sequence>& sequences);
 
-        const vector<sequence>& sequences() const noexcept;
-        const sequence* find_sequence(str_hash name) const noexcept;
+        [[nodiscard]] const vector<sequence>& sequences() const noexcept;
+        [[nodiscard]] const sequence* find_sequence(str_hash name) const noexcept;
     private:
         vector<frame> frames_;
         vector<sequence> sequences_;

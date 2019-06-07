@@ -33,10 +33,10 @@ namespace e2d
         prefab& set_children(vector<prefab>&& children) noexcept;
         prefab& set_children(const vector<prefab>& children);
 
-        ecs::prototype& prototype() noexcept;
-        const ecs::prototype& prototype() const noexcept;
+        [[nodiscard]] ecs::prototype& prototype() noexcept;
+        [[nodiscard]] const ecs::prototype& prototype() const noexcept;
 
-        const vector<prefab>& children() const noexcept;
+        [[nodiscard]] const vector<prefab>& children() const noexcept;
     private:
         ecs::prototype prototype_;
         vector<prefab> children_;

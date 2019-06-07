@@ -29,51 +29,51 @@ namespace e2d
     public:
         virtual ~node() noexcept;
 
-        static node_iptr create();
-        static node_iptr create(const node_iptr& parent);
+        [[nodiscard]] static node_iptr create();
+        [[nodiscard]] static node_iptr create(const node_iptr& parent);
 
-        static node_iptr create(const gobject_iptr& owner);
-        static node_iptr create(const gobject_iptr& owner, const node_iptr& parent);
+        [[nodiscard]] static node_iptr create(const gobject_iptr& owner);
+        [[nodiscard]] static node_iptr create(const gobject_iptr& owner, const node_iptr& parent);
 
         void owner(const gobject_iptr& owner) noexcept;
 
-        gobject_iptr owner() noexcept;
-        const_gobject_iptr owner() const noexcept;
+        [[nodiscard]] gobject_iptr owner() noexcept;
+        [[nodiscard]] const_gobject_iptr owner() const noexcept;
 
         void transform(const t3f& transform) noexcept;
-        const t3f& transform() const noexcept;
+        [[nodiscard]] const t3f& transform() const noexcept;
 
         void translation(const v3f& translation) noexcept;
-        const v3f& translation() const noexcept;
+        [[nodiscard]] const v3f& translation() const noexcept;
 
         void rotation(const q4f& rotation) noexcept;
-        const q4f& rotation() const noexcept;
+        [[nodiscard]] const q4f& rotation() const noexcept;
 
         void scale(const v3f& scale) noexcept;
-        const v3f& scale() const noexcept;
+        [[nodiscard]] const v3f& scale() const noexcept;
 
-        const m4f& local_matrix() const noexcept;
-        const m4f& world_matrix() const noexcept;
+        [[nodiscard]] const m4f& local_matrix() const noexcept;
+        [[nodiscard]] const m4f& world_matrix() const noexcept;
 
-        node_iptr root() noexcept;
-        const_node_iptr root() const noexcept;
+        [[nodiscard]] node_iptr root() noexcept;
+        [[nodiscard]] const_node_iptr root() const noexcept;
 
-        node_iptr parent() noexcept;
-        const_node_iptr parent() const noexcept;
+        [[nodiscard]] node_iptr parent() noexcept;
+        [[nodiscard]] const_node_iptr parent() const noexcept;
 
-        bool has_parent() const noexcept;
-        bool has_parent_recursive(
+        [[nodiscard]] bool has_parent() const noexcept;
+        [[nodiscard]] bool has_parent_recursive(
             const const_node_iptr& parent) const noexcept;
 
-        bool has_children() const noexcept;
-        bool has_child_recursive(
+        [[nodiscard]] bool has_children() const noexcept;
+        [[nodiscard]] bool has_child_recursive(
             const const_node_iptr& child) const noexcept;
 
         bool remove_from_parent() noexcept;
         std::size_t remove_all_children() noexcept;
 
-        std::size_t child_count() const noexcept;
-        std::size_t child_count_recursive() const noexcept;
+        [[nodiscard]] std::size_t child_count() const noexcept;
+        [[nodiscard]] std::size_t child_count_recursive() const noexcept;
 
         bool add_child(
             const node_iptr& child) noexcept;
@@ -107,17 +107,17 @@ namespace e2d
         bool send_forward() noexcept;
         bool bring_to_front() noexcept;
 
-        node_iptr first_child() noexcept;
-        const_node_iptr first_child() const noexcept;
+        [[nodiscard]] node_iptr first_child() noexcept;
+        [[nodiscard]] const_node_iptr first_child() const noexcept;
 
-        node_iptr last_child() noexcept;
-        const_node_iptr last_child() const noexcept;
+        [[nodiscard]] node_iptr last_child() noexcept;
+        [[nodiscard]] const_node_iptr last_child() const noexcept;
 
-        node_iptr prev_sibling() noexcept;
-        const_node_iptr prev_sibling() const noexcept;
+        [[nodiscard]] node_iptr prev_sibling() noexcept;
+        [[nodiscard]] const_node_iptr prev_sibling() const noexcept;
 
-        node_iptr next_sibling() noexcept;
-        const_node_iptr next_sibling() const noexcept;
+        [[nodiscard]] node_iptr next_sibling() noexcept;
+        [[nodiscard]] const_node_iptr next_sibling() const noexcept;
 
         template < typename F >
         void for_each_child(F&& f);

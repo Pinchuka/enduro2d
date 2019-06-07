@@ -30,7 +30,7 @@ namespace e2d
         atlas& assign(const atlas& other);
 
         atlas& set_texture(const texture_asset::ptr& texture) noexcept;
-        const texture_asset::ptr& texture() const noexcept;
+        [[nodiscard]] const texture_asset::ptr& texture() const noexcept;
     private:
         texture_asset::ptr texture_;
     };

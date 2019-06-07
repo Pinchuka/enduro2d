@@ -30,11 +30,11 @@ namespace e2d
         model& assign(const model& other);
 
         model& set_mesh(const mesh_asset::ptr& mesh);
-        const mesh_asset::ptr& mesh() const noexcept;
+        [[nodiscard]] const mesh_asset::ptr& mesh() const noexcept;
 
         // It can only be called from the main thread
         void regenerate_geometry(render& render);
-        const render::geometry& geometry() const noexcept;
+        [[nodiscard]] const render::geometry& geometry() const noexcept;
     private:
         mesh_asset::ptr mesh_;
         render::geometry geometry_;

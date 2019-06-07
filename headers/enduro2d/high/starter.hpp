@@ -53,11 +53,11 @@ namespace e2d
         parameters& library_root(const url& value);
         parameters& engine_params(const engine::parameters& value);
 
-        url& library_root() noexcept;
-        engine::parameters& engine_params() noexcept;
+        [[nodiscard]] url& library_root() noexcept;
+        [[nodiscard]] engine::parameters& engine_params() noexcept;
 
-        const url& library_root() const noexcept;
-        const engine::parameters& engine_params() const noexcept;
+        [[nodiscard]] const url& library_root() const noexcept;
+        [[nodiscard]] const engine::parameters& engine_params() const noexcept;
     private:
         url library_root_{"resources://bin/library"};
         engine::parameters engine_params_;

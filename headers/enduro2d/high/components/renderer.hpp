@@ -18,19 +18,19 @@ namespace e2d
         renderer() = default;
 
         renderer& enabled(bool value) noexcept;
-        bool enabled() const noexcept;
+        [[nodiscard]] bool enabled() const noexcept;
 
         renderer& properties(render::property_block&& value) noexcept;
         renderer& properties(const render::property_block& value);
 
-        render::property_block& properties() noexcept;
-        const render::property_block& properties() const noexcept;
+        [[nodiscard]] render::property_block& properties() noexcept;
+        [[nodiscard]] const render::property_block& properties() const noexcept;
 
         renderer& materials(vector<material_asset::ptr>&& value) noexcept;
         renderer& materials(const vector<material_asset::ptr>& value);
 
-        vector<material_asset::ptr>& materials() noexcept;
-        const vector<material_asset::ptr>& materials() const noexcept;
+        [[nodiscard]] vector<material_asset::ptr>& materials() noexcept;
+        [[nodiscard]] const vector<material_asset::ptr>& materials() const noexcept;
     private:
         bool enabled_ = true;
         render::property_block properties_;

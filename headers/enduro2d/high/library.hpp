@@ -37,7 +37,7 @@ namespace e2d
         virtual ~loading_asset() noexcept = default;
 
         virtual void cancel() noexcept = 0;
-        virtual str_hash address() const noexcept = 0;
+        [[nodiscard]] virtual str_hash address() const noexcept = 0;
         virtual void wait(deferrer& deferrer) const noexcept = 0;
     };
 
@@ -69,23 +69,23 @@ namespace e2d
         library(const url& root, deferrer& deferrer);
         ~library() noexcept final;
 
-        const url& root() const noexcept;
-        const asset_cache& cache() const noexcept;
+        [[nodiscard]] const url& root() const noexcept;
+        [[nodiscard]] const asset_cache& cache() const noexcept;
 
         std::size_t unload_unused_assets() noexcept;
         std::size_t loading_asset_count() const noexcept;
 
         template < typename Asset >
-        typename Asset::load_result load_main_asset(str_view address) const;
+        [[nodiscard]] typename Asset::load_result load_main_asset(str_view address) const;
 
         template < typename Asset >
-        typename Asset::load_async_result load_main_asset_async(str_view address) const;
+        [[nodiscard]] typename Asset::load_async_result load_main_asset_async(str_view address) const;
 
         template < typename Asset, typename Nested = Asset >
-        typename Nested::load_result load_asset(str_view address) const;
+        [[nodiscard]] typename Nested::load_result load_asset(str_view address) const;
 
         template < typename Asset, typename Nested = Asset >
-        typename Nested::load_async_result load_asset_async(str_view address) const;
+        [[nodiscard]] typename Nested::load_async_result load_asset_async(str_view address) const;
     private:
         template < typename Asset >
         vector<loading_asset_iptr>::iterator
@@ -127,7 +127,7 @@ namespace e2d
         asset_group& add_asset(str_view address, const asset_ptr& asset);
 
         template < typename Asset, typename Nested = Asset >
-        typename Nested::load_result find_asset(str_view address) const;
+        [[nodiscard]] typename Nested::load_result find_asset(str_view address) const;
     private:
         flat_multimap<str, asset_ptr> assets_;
     };
@@ -146,8 +146,8 @@ namespace e2d
         asset_dependency() = default;
         virtual ~asset_dependency() noexcept = default;
 
-        virtual const str& main_address() const noexcept = 0;
-        virtual stdex::promise<asset_ptr> load_async(const library& library) = 0;
+        [[nodiscard]] virtual const str& main_address() const noexcept = 0;
+        [[nodiscard]] virtual stdex::promise<asset_ptr> load_async(const library& library) = 0;
     };
 
     template < typename Asset >
@@ -176,7 +176,7 @@ namespace e2d
 
         template < typename Asset, typename Nested = Asset >
         asset_dependencies& add_dependency(str_view address);
-        stdex::promise<asset_group> load_async(const library& library) const;
+        [[nodiscard]] stdex::promise<asset_group> load_async(const library& library) const;
     private:
         flat_multimap<str, asset_dependency_iptr> dependencies_;
     };
