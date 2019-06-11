@@ -10,6 +10,7 @@
 #include <enduro2d/core/debug.hpp>
 #include <enduro2d/core/deferrer.hpp>
 #include <enduro2d/core/input.hpp>
+#include <enduro2d/core/network.hpp>
 #include <enduro2d/core/platform.hpp>
 #include <enduro2d/core/render.hpp>
 #include <enduro2d/core/vfs.hpp>
@@ -376,6 +377,11 @@ namespace e2d
 
         safe_module_initialize<input>();
 
+        // setup network
+
+        safe_module_initialize<network>(
+            the<debug>());
+
         // setup graphics
 
         if ( !params.without_graphics() )
@@ -410,6 +416,7 @@ namespace e2d
         modules::shutdown<dbgui>();
         modules::shutdown<render>();
         modules::shutdown<window>();
+        modules::shutdown<network>();
         modules::shutdown<input>();
         modules::shutdown<vfs>();
         modules::shutdown<debug>();

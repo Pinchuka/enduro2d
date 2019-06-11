@@ -32,6 +32,7 @@ namespace e2d
     class mouse;
     class keyboard;
     class input;
+    class network;
     class platform;
     class render;
     class shader;
