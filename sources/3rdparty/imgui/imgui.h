@@ -1,4 +1,4 @@
-// dear imgui, v1.71 WIP
+// dear imgui, v1.71
 // (headers)
 
 // See imgui.cpp file for documentation.
@@ -46,12 +46,13 @@ Index of this file:
 
 // Version
 // (Integer encoded as XYYZZ for use in #if preprocessor conditionals. Work in progress versions typically starts at XYY99 then bounce up to XYY00, XYY01 etc. when release tagging happens)
-#define IMGUI_VERSION               "1.71 WIP"
-#define IMGUI_VERSION_NUM           17003
+#define IMGUI_VERSION               "1.71"
+#define IMGUI_VERSION_NUM           17100
 #define IMGUI_CHECKVERSION()        ImGui::DebugCheckVersionAndDataLayout(IMGUI_VERSION, sizeof(ImGuiIO), sizeof(ImGuiStyle), sizeof(ImVec2), sizeof(ImVec4), sizeof(ImDrawVert), sizeof(ImDrawIdx))
 
 // Define attributes of all API symbols declarations (e.g. for DLL under Windows)
 // IMGUI_API is used for core imgui functions, IMGUI_IMPL_API is used for the default bindings files (imgui_impl_xxx.h)
+// Using dear imgui via a shared library is not recommended, because of function call overhead and because we don't guarantee backward nor forward ABI compatibility.
 #ifndef IMGUI_API
 #define IMGUI_API
 #endif
@@ -881,7 +882,7 @@ enum ImGuiDragDropFlags_
     ImGuiDragDropFlags_SourceNoDisableHover         = 1 << 1,   // By default, when dragging we clear data so that IsItemHovered() will return false, to avoid subsequent user code submitting tooltips. This flag disable this behavior so you can still call IsItemHovered() on the source item.
     ImGuiDragDropFlags_SourceNoHoldToOpenOthers     = 1 << 2,   // Disable the behavior that allows to open tree nodes and collapsing header by holding over them while dragging a source item.
     ImGuiDragDropFlags_SourceAllowNullID            = 1 << 3,   // Allow items such as Text(), Image() that have no unique identifier to be used as drag source, by manufacturing a temporary identifier based on their window-relative position. This is extremely unusual within the dear imgui ecosystem and so we made it explicit.
-    ImGuiDragDropFlags_SourceExtern                 = 1 << 4,   // External source (from outside of imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously.
+    ImGuiDragDropFlags_SourceExtern                 = 1 << 4,   // External source (from outside of dear imgui), won't attempt to read current item/window info. Will always return true. Only one Extern source can be active simultaneously.
     ImGuiDragDropFlags_SourceAutoExpirePayload      = 1 << 5,   // Automatically expire the payload if the source cease to be submitted (otherwise payloads are persisting while being dragged)
     // AcceptDragDropPayload() flags
     ImGuiDragDropFlags_AcceptBeforeDelivery         = 1 << 10,  // AcceptDragDropPayload() will returns true even before the mouse button is released. You can then call IsDelivery() to test if the payload needs to be delivered.
@@ -995,7 +996,7 @@ enum ImGuiConfigFlags_
     ImGuiConfigFlags_NoMouse                = 1 << 4,   // Instruct imgui to clear mouse position/buttons in NewFrame(). This allows ignoring the mouse information set by the back-end.
     ImGuiConfigFlags_NoMouseCursorChange    = 1 << 5,   // Instruct back-end to not alter mouse cursor shape and visibility. Use if the back-end cursor changes are interfering with yours and you don't want to use SetMouseCursor() to change mouse cursor. You may want to honor requests from imgui by reading GetMouseCursor() yourself instead.
 
-    // User storage (to allow your back-end/engine to communicate to code that may be shared between multiple projects. Those flags are not used by core ImGui)
+    // User storage (to allow your back-end/engine to communicate to code that may be shared between multiple projects. Those flags are not used by core Dear ImGui)
     ImGuiConfigFlags_IsSRGB                 = 1 << 20,  // Application is SRGB-aware.
     ImGuiConfigFlags_IsTouchScreen          = 1 << 21   // Application is using a touch screen instead of a mouse.
 };
@@ -1163,12 +1164,12 @@ enum ImGuiMouseCursor_
     ImGuiMouseCursor_None = -1,
     ImGuiMouseCursor_Arrow = 0,
     ImGuiMouseCursor_TextInput,         // When hovering over InputText, etc.
-    ImGuiMouseCursor_ResizeAll,         // (Unused by imgui functions)
+    ImGuiMouseCursor_ResizeAll,         // (Unused by Dear ImGui functions)
     ImGuiMouseCursor_ResizeNS,          // When hovering over an horizontal border
     ImGuiMouseCursor_ResizeEW,          // When hovering over a vertical border or a column
     ImGuiMouseCursor_ResizeNESW,        // When hovering over the bottom-left corner of a window
     ImGuiMouseCursor_ResizeNWSE,        // When hovering over the bottom-right corner of a window
-    ImGuiMouseCursor_Hand,              // (Unused by imgui functions. Use for e.g. hyperlinks)
+    ImGuiMouseCursor_Hand,              // (Unused by Dear ImGui functions. Use for e.g. hyperlinks)
     ImGuiMouseCursor_COUNT
 
     // Obsolete names (will be removed)
@@ -1280,7 +1281,7 @@ struct ImVector
 
 struct ImGuiStyle
 {
-    float       Alpha;                      // Global alpha applies to everything in ImGui.
+    float       Alpha;                      // Global alpha applies to everything in Dear ImGui.
     ImVec2      WindowPadding;              // Padding within a window.
     float       WindowRounding;             // Radius of window corners rounding. Set to 0.0f to have rectangular windows.
     float       WindowBorderSize;           // Thickness of border around windows. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
@@ -1440,7 +1441,7 @@ struct ImGuiIO
     bool        MouseClicked[5];                // Mouse button went from !Down to Down
     bool        MouseDoubleClicked[5];          // Has mouse button been double-clicked?
     bool        MouseReleased[5];               // Mouse button went from Down to !Down
-    bool        MouseDownOwned[5];              // Track if button was clicked inside an imgui window. We don't request mouse capture from the application if click started outside ImGui bounds.
+    bool        MouseDownOwned[5];              // Track if button was clicked inside a dear imgui window. We don't request mouse capture from the application if click started outside ImGui bounds.
     bool        MouseDownWasDoubleClick[5];     // Track if button down was a double-click
     float       MouseDownDuration[5];           // Duration the mouse button has been down (0.0f == just clicked)
     float       MouseDownDurationPrev[5];       // Previous time the mouse button has been down
@@ -1534,7 +1535,7 @@ struct ImGuiPayload
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 namespace ImGui
 {
-    // OBSOLETED in 1.71 (from May 2019)
+    // OBSOLETED in 1.71 (from June 2019)
     static inline void SetNextTreeNodeOpen(bool open, ImGuiCond cond = 0)   { SetNextItemOpen(open, cond); }
     // OBSOLETED in 1.70 (from May 2019)
     static inline float GetContentRegionAvailWidth()          { return GetContentRegionAvail().x; }
@@ -1962,7 +1963,7 @@ struct ImDrawList
     IMGUI_API void  UpdateTextureID();
 };
 
-// All draw data to render an ImGui frame
+// All draw data to render a Dear ImGui frame
 // (NB: the style and the naming convention here is a little inconsistent, we currently preserve them for backward compatibility purpose,
 // as this is one of the oldest structure exposed by the library! Basically, ImDrawList == CmdList)
 struct ImDrawData
@@ -1981,7 +1982,7 @@ struct ImDrawData
     ~ImDrawData()   { Clear(); }
     void Clear()    { Valid = false; CmdLists = NULL; CmdListsCount = TotalVtxCount = TotalIdxCount = 0; DisplayPos = DisplaySize = FramebufferScale = ImVec2(0.f, 0.f); } // The ImDrawList are owned by ImGuiContext!
     IMGUI_API void  DeIndexAllBuffers();                    // Helper to convert all buffers from indexed to non-indexed, in case you cannot render indexed. Note: this is slow and most likely a waste of resources. Always prefer indexed rendering!
-    IMGUI_API void  ScaleClipRects(const ImVec2& fb_scale); // Helper to scale the ClipRect field of each ImDrawCmd. Use if your final output buffer is at a different scale than ImGui expects, or if there is a difference between your window resolution and framebuffer resolution.
+    IMGUI_API void  ScaleClipRects(const ImVec2& fb_scale); // Helper to scale the ClipRect field of each ImDrawCmd. Use if your final output buffer is at a different scale than Dear ImGui expects, or if there is a difference between your window resolution and framebuffer resolution.
 };
 
 //-----------------------------------------------------------------------------
