@@ -16,7 +16,7 @@ namespace e2d
     // http_request
     //
 
-    class http_request {
+    class http_request final {
     public:
         enum class method : u8 {
             get,
@@ -24,6 +24,7 @@ namespace e2d
             head
         };
         using data_t = std::vector<u8>;
+        using content_t = stdex::variant<stdex::monostate, data_t, input_stream_uptr>;
     public:
         http_request(str_view, method) noexcept;
         http_request(const e2d::url&, method) noexcept;
@@ -34,38 +35,40 @@ namespace e2d
         http_request& content(buffer_view value) noexcept;
         http_request& content(const void* data, std::size_t size) noexcept;
         http_request& append_content(buffer_view value) noexcept;
-        http_request& output_stream(input_stream_uptr) noexcept;
+        http_request& output_stream(output_stream_uptr) noexcept;
         [[nodiscard]] secf timeout() const noexcept;
         [[nodiscard]] const str& url() const noexcept;
         [[nodiscard]] const flat_map<str, str>& headers() const noexcept;
         [[nodiscard]] method type() const noexcept;
         [[nodiscard]] const data_t& content_data() const; // throw(stdex::bad_variant_access)
-        [[nodiscard]] const output_stream_uptr& content_stream() const; // throw(stdex::bad_variant_access)
-        [[nodiscard]] const input_stream_uptr& output_stream() const noexcept;
+        [[nodiscard]] const input_stream_uptr& content_stream() const; // throw(stdex::bad_variant_access)
+        [[nodiscard]] const output_stream_uptr& output_stream() const noexcept;
     private:
-        [[nodiscard]] data_t& content_data() noexcept;
-        [[nodiscard]] output_stream_uptr& content_stream() noexcept;
+        [[nodiscard]] data_t& edit_content_data() noexcept;
+        [[nodiscard]] input_stream_uptr& edit_content_stream() noexcept;
     private:
-        using content_t = stdex::variant<stdex::monostate, data_t, output_stream_uptr>;
         content_t content_;
         str url_;
         method method_;
         flat_map<str, str> headers_;
         secf timeout_;
-        input_stream_uptr output_stream_;
+        output_stream_uptr output_stream_;
     };
 
     //
     // http_response
     //
 
-    class http_response {
+    class http_response final {
     public:
-        explicit http_response(const http_request&);
+        class internal_state;
+        using internal_state_uptr = std::unique_ptr<internal_state>;
+        const internal_state& state() const noexcept;
+    public:
+        explicit http_response(internal_state_uptr);
         [[nodiscard]] u16 status_code() const;
     private:
-        class internal_state;
-        std::unique_ptr<internal_state> state_;
+        internal_state_uptr state_;
     };
 
     //

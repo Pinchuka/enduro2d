@@ -23,16 +23,16 @@ namespace e2d
     , method_(m) {
     }
 
-    http_request::data_t& http_request::content_data() noexcept {
+    http_request::data_t& http_request::edit_content_data() noexcept {
         if ( !stdex::holds_alternative<data_t>(content_) )
             content_ = data_t();
         return stdex::get<data_t>(content_);
     }
 
-    output_stream_uptr& http_request::content_stream() noexcept {
-        if ( !stdex::holds_alternative<output_stream_uptr>(content_) )
-            content_ = output_stream_uptr();
-        return stdex::get<output_stream_uptr>(content_);
+    input_stream_uptr& http_request::edit_content_stream() noexcept {
+        if ( !stdex::holds_alternative<input_stream_uptr>(content_) )
+            content_ = input_stream_uptr();
+        return stdex::get<input_stream_uptr>(content_);
     }
 
     http_request& http_request::timeout(secf value) noexcept {
@@ -46,23 +46,23 @@ namespace e2d
     }
 
     http_request& http_request::content(buffer_view value) noexcept {
-        content_data().assign((u8*)value.data(), (u8*)value.data() + value.size());
+        edit_content_data().assign((u8*)value.data(), (u8*)value.data() + value.size());
         return *this;
     }
 
     http_request& http_request::content(const void* data, std::size_t size) noexcept {
         E2D_ASSERT(data && size);
-        content_data().assign((u8*)data, (u8*)data + size);
+        edit_content_data().assign((u8*)data, (u8*)data + size);
         return *this;
     }
 
     http_request& http_request::append_content(buffer_view value) noexcept {
-        data_t& d = content_data();
+        data_t& d = edit_content_data();
         d.insert(d.end(), (u8*)value.data(), (u8*)value.data() + value.size());
         return *this;
     }
 
-    http_request& http_request::output_stream(input_stream_uptr value) noexcept {
+    http_request& http_request::output_stream(output_stream_uptr value) noexcept {
         output_stream_ = std::move(value);
         return *this;
     }
@@ -71,11 +71,11 @@ namespace e2d
         return stdex::get<data_t>(content_);
     }
 
-    const output_stream_uptr& http_request::content_stream() const {
-        return stdex::get<output_stream_uptr>(content_);
+    const input_stream_uptr& http_request::content_stream() const {
+        return stdex::get<input_stream_uptr>(content_);
     }
 
-    const input_stream_uptr& http_request::output_stream() const noexcept {
+    const output_stream_uptr& http_request::output_stream() const noexcept {
         return output_stream_;
     }
 
