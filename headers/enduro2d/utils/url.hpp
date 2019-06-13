@@ -38,6 +38,7 @@ namespace e2d
 
         const str& scheme() const noexcept;
         const str& path() const noexcept;
+        str schemepath() const noexcept;
 
         url& operator+=(str_view path);
         url& operator/=(str_view path);

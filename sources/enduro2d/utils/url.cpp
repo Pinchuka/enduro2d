@@ -135,6 +135,10 @@ namespace e2d
         return path_;
     }
 
+    str url::schemepath() const noexcept {
+        return scheme_ + "://" + path_;
+    }
+
     url& url::operator+=(str_view path) {
         return concat(path);
     }
