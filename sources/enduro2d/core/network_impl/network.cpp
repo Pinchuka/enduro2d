@@ -8,6 +8,10 @@
 
 namespace e2d
 {
+    //
+    // http_request
+    //
+    
     http_request::http_request(str_view u, method m) noexcept
     : url_(u)
     , method_(m) {
@@ -47,6 +51,16 @@ namespace e2d
 
     http_request& http_request::content(buffer_view value) noexcept {
         edit_content_data().assign((u8*)value.data(), (u8*)value.data() + value.size());
+        return *this;
+    }
+
+    http_request& http_request::content(str_view value) noexcept {
+        edit_content_data().assign(value.begin(), value.end());
+        return *this;
+    }
+
+    http_request& http_request::content(data_t&& value) noexcept {
+        edit_content_data() = std::move(value);
         return *this;
     }
 
@@ -93,6 +107,20 @@ namespace e2d
 
     http_request::method http_request::type() const noexcept {
         return method_;
+    }
+
+    //
+    // http_response
+    //
+
+    http_response::http_response(
+        flat_map<str, str>&& headers,
+        std::vector<u8>&& content)
+    : headers_(headers)
+    , content_(content) {}
+
+    u16 http_response::status_code() const {
+        return 0;   // TODO
     }
 }
 

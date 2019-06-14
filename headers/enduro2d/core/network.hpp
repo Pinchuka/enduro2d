@@ -13,6 +13,17 @@
 namespace e2d
 {
     //
+    // bad_network_operation
+    //
+
+    class bad_network_operation final : public exception {
+    public:
+        const char* what() const noexcept final {
+            return "bad network operation";
+        }
+    };
+
+    //
     // http_request
     //
 
@@ -33,6 +44,8 @@ namespace e2d
         http_request& header(const str&, const str&) noexcept;
         http_request& content(output_stream_uptr) noexcept;
         http_request& content(buffer_view value) noexcept;
+        http_request& content(str_view value) noexcept;
+        http_request& content(data_t&& value) noexcept;
         http_request& content(const void* data, std::size_t size) noexcept;
         http_request& append_content(buffer_view value) noexcept;
         http_request& output_stream(output_stream_uptr) noexcept;
@@ -47,11 +60,13 @@ namespace e2d
         [[nodiscard]] data_t& edit_content_data() noexcept;
         [[nodiscard]] input_stream_uptr& edit_content_stream() noexcept;
     private:
-        content_t content_;
         str url_;
         method method_;
         flat_map<str, str> headers_;
         secf timeout_;
+    private:
+        friend class network;
+        content_t content_;
         output_stream_uptr output_stream_;
     };
 
@@ -61,14 +76,13 @@ namespace e2d
 
     class http_response final {
     public:
-        class internal_state;
-        using internal_state_uptr = std::unique_ptr<internal_state>;
-        const internal_state& state() const noexcept;
-    public:
-        explicit http_response(internal_state_uptr);
+        http_response(
+            flat_map<str, str>&& headers,
+            std::vector<u8>&& content);
         [[nodiscard]] u16 status_code() const;
     private:
-        internal_state_uptr state_;
+        flat_map<str, str> headers_;
+        std::vector<u8> content_;
     };
 
     //
@@ -77,20 +91,13 @@ namespace e2d
 
     class network final : public module<network> {
     public:
-        using response_t = stdex::promise<http_response>;
-    public:
         network(debug& d);
         ~network() noexcept;
 
-        [[nodiscard]] response_t send(http_request);
-
-        // temp:
-        void update();
+        [[nodiscard]] stdex::promise<http_response> send(http_request);
+        void tick();
     private:
         class internal_state;
         std::unique_ptr<internal_state> state_;
-
-        using request_queue_t = std::deque<std::pair<http_request, response_t>>;
-        request_queue_t queue_;
     };
 }

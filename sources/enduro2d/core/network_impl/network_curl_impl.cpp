@@ -11,16 +11,25 @@
 namespace e2d
 {
     //
-    // http_response::internal_state
+    // curl_http_request
     //
 
-    http_response::internal_state::internal_state(
+    curl_http_request::curl_http_request(
         debug& debug,
-        http_request&& request)
-    : debug_(debug)
+        str_view url,
+        const flat_map<str, str>& headers,
+        http_request::method method,
+        secf timeout,
+        http_request::content_t &&content,
+        output_stream_uptr &&stream,
+        stdex::promise<http_response> result)
+    : timeout_(timeout)
+    , content_(std::move(content))
+    , debug_(debug)
     , slist_(nullptr)
-    , request_(std::move(request))
-    , add_to_curlm_(CURLM_LAST) {
+    , add_to_curlm_(CURLM_LAST)
+    , response_stream_(std::move(stream))
+    , result_(result) {
         curl_ = curl_easy_init();
         curl_easy_setopt(curl_, CURLOPT_DEBUGDATA, this);
         curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, &debug_callback);
@@ -32,6 +41,7 @@ namespace e2d
         curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
         curl_easy_setopt(curl_, CURLOPT_PRIVATE, this);
         //curl_easy_setopt(curl_, CURLOPT_PROXY, );
+        curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1L);
 
         // for SSL
         if ( true ) {
@@ -40,45 +50,41 @@ namespace e2d
             //curl_easy_setopt(curl_, CURLOPT_SSL_CTX_DATA, this);
         }
 
-        if ( request_.headers().size() ) {
-            for (auto& hdr : request.headers()) {
+        if ( headers.size() ) {
+            for (auto& hdr : headers) {
                 slist_ = curl_slist_append(slist_, (str(hdr.first) + ": " + hdr.second).data());
             }
             curl_easy_setopt(curl_, CURLOPT_HTTPHEADER, slist_);
         }
 
-        switch (request_.type())
+        switch (method)
         {
         case http_request::method::get :
             curl_easy_setopt(curl_, CURLOPT_HTTPGET, 1L);
             curl_easy_setopt(curl_, CURLOPT_READDATA, this);
-            try {
-                auto& data = request_.content_data();
-                E2D_UNUSED(data);
+            if ( auto* data = stdex::get_if<http_request::data_t>(&content_) ) {
                 curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_data_callback);
-            } catch(...) {
-                // TODO: no content
+            } else {
+                throw bad_network_operation();
             }
             break;
 
         case http_request::method::post :
             curl_easy_setopt(curl_, CURLOPT_POST, 1L);
             curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, nullptr);
-            try {
-                auto& data = request_.content_data();
-                curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, data.size());
-                //curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, data.data());
+            if ( auto* data = stdex::get_if<http_request::data_t>(&content_) ) {
+                curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, data->size());
+                curl_easy_setopt(curl_, CURLOPT_READDATA, this);
                 curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_data_callback);
-            } catch(...) {
-                try {
-                    auto& stream = request_.content_stream();
-                    curl_easy_setopt(curl_, CURLOPT_INFILESIZE, stream->length());
-                    curl_easy_setopt(curl_, CURLOPT_READDATA, this);
-                    curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, nullptr);
-                    curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_stream_callback);
-                } catch(...) {
-                    // TODO: no content
-                }
+            }
+            else if ( auto* stream = stdex::get_if<input_stream_uptr>(&content_) ) {
+                curl_easy_setopt(curl_, CURLOPT_INFILESIZE, (*stream)->length());
+                curl_easy_setopt(curl_, CURLOPT_READDATA, this);
+                curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, nullptr);
+                curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_stream_callback);
+            }
+            else {
+                throw bad_network_operation();
             }
             break;
 
@@ -87,7 +93,7 @@ namespace e2d
             break;
         }
 
-        curl_easy_setopt(curl_, CURLOPT_URL, request_.url().data());
+        curl_easy_setopt(curl_, CURLOPT_URL, url.data());
 
         // to receive responce headers
         curl_easy_setopt(curl_, CURLOPT_HEADERDATA, this);
@@ -97,13 +103,21 @@ namespace e2d
         curl_easy_setopt(curl_, CURLOPT_WRITEDATA, this);
         curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, write_callback);
 
-        curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, (long)math::round(request_.timeout().value));
+        curl_easy_setopt(curl_, CURLOPT_CONNECTTIMEOUT, (long)math::round(timeout_.value));
 
         // TODO
         //curl_easy_setopt(curl_, CURLOPT_ACCEPT_ENCODING, "");
+
+        canceled_.store(false);
+        result_.except([this](std::exception_ptr) {
+            canceled_.store(true);
+            return http_response(
+                    std::move(response_headers_),
+                    std::move(response_content_));
+        });
     }
 
-    http_response::internal_state::~internal_state() noexcept {
+    curl_http_request::~curl_http_request() noexcept {
         if ( curl_ ) {
             curl_easy_setopt(curl_, CURLOPT_DEBUGDATA, nullptr);
             curl_easy_cleanup(curl_);
@@ -115,26 +129,26 @@ namespace e2d
         }
     }
 
-    void http_response::internal_state::add(CURLSH* curlm) noexcept {
+    void curl_http_request::enque(CURLSH* curlm) noexcept {
         add_to_curlm_ = curl_multi_add_handle(curlm, curl_);
     }
 
-    void http_response::internal_state::remove(CURLSH* curlm) noexcept {
+    void curl_http_request::complete(CURLSH* curlm) noexcept {
         curl_multi_remove_handle(curlm, curl_);
         add_to_curlm_ = CURLM_LAST;
     }
 
-    debug& http_response::internal_state::dbg() const noexcept {
+    debug& curl_http_request::dbg() const noexcept {
         return debug_;
     }
 
-    CURL* http_response::internal_state::curl() const noexcept {
+    CURL* curl_http_request::curl() const noexcept {
         return curl_;
     }
 
-    size_t http_response::internal_state::read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
-        auto* self = static_cast<http_response::internal_state *>(userdata);
-        auto& src = self->request_.content_data();
+    size_t curl_http_request::read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+        auto* self = static_cast<curl_http_request *>(userdata);
+        auto& src = stdex::get<http_request::data_t>(self->content_);
         size_t offset = self->sent_.load();
         size_t required = size * nitems;
         size_t written = 0;
@@ -146,9 +160,9 @@ namespace e2d
         return written;
     }
 
-    size_t http_response::internal_state::read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
-        auto* self = static_cast<http_response::internal_state *>(userdata);
-        auto& src = self->request_.content_stream();
+    size_t curl_http_request::read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+        auto* self = static_cast<curl_http_request *>(userdata);
+        auto& src = stdex::get<input_stream_uptr>(self->content_);
         size_t offset = self->sent_.load();
         E2D_ASSERT(offset == src->tell());
         size_t required = size * nitems;
@@ -157,39 +171,51 @@ namespace e2d
         return written;
     }
 
-    size_t http_response::internal_state::header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
-        auto* self = static_cast<http_response::internal_state *>(userdata);
+    size_t curl_http_request::header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+        auto* self = static_cast<curl_http_request *>(userdata);
         size_t header_size = size * nitems;
         if ( header_size > 0 && header_size <= CURL_MAX_HTTP_HEADER ) {
             str_view header(buffer, header_size);
             size_t separator = header.find(':');
             if ( separator != str_view::npos ) {
-                self->headers_.insert_or_assign(str(header.substr(0, separator)), str(header.substr(separator)));
+                self->response_headers_.insert_or_assign(str(header.substr(0, separator)), str(header.substr(separator)));
             } else {
-                self->headers_.insert_or_assign(str(header), str());
+                self->response_headers_.insert_or_assign(str(header), str());
             }
         }
         return 0;
     }
 
-    size_t http_response::internal_state::write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-        auto* self = static_cast<http_response::internal_state *>(userdata);
+    size_t curl_http_request::write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+        auto* self = static_cast<curl_http_request *>(userdata);
         size_t buffer_size = size * nmemb;
-        size_t offset = self->content_.size();
-        if ( buffer_size ) {
-            self->content_.resize(self->content_.size() + buffer_size); // TODO: check exeption?
-            memcpy(self->content_.data() + offset, ptr, buffer_size);
+        size_t offset = self->response_content_.size();
+        if ( buffer_size == 0 )
+            return 0;
+        if ( self->response_stream_ ) {
+            try {
+                return self->response_stream_->write(ptr, buffer_size);
+            } catch(...) {
+                return 0;
+            }
+        } else {
+            try {
+                self->response_content_.resize(self->response_content_.size() + buffer_size);
+            } catch(...) {
+                return 0;
+            }
+            memcpy(self->response_content_.data() + offset, ptr, buffer_size);
             return buffer_size;
         }
         return 0;
     }
 
-    int http_response::internal_state::debug_callback(CURL *handle,
-                                                      curl_infotype type,
-                                                      char *data,
-                                                      size_t size,
-                                                      void *userptr) {
-        auto* self = static_cast<http_response::internal_state *>(userptr);
+    int curl_http_request::debug_callback(CURL *handle,
+                                          curl_infotype type,
+                                          char *data,
+                                          size_t size,
+                                          void *userptr) {
+        auto* self = static_cast<curl_http_request *>(userptr);
         E2D_ASSERT(handle == self->curl());
         switch (type)
         {
@@ -211,6 +237,18 @@ namespace e2d
             break;
         }
         return 0;
+    }
+
+    bool curl_http_request::is_complete() noexcept {
+        if ( canceled_.load() )
+            return true;
+
+        if ( add_to_curlm_ != CURLM_OK )
+            return true;
+
+        // TODO: check timeout
+
+        return false;
     }
 
     //
@@ -237,6 +275,10 @@ namespace e2d
             curl_multi_cleanup(curl_);
             curl_ = nullptr;
         }
+        if ( curl_shared_ ) {
+            curl_share_cleanup(curl_shared_);
+            curl_shared_ = nullptr;
+        }
         curl_global_cleanup();
     }
 
@@ -244,14 +286,30 @@ namespace e2d
         return debug_;
     }
 
-    CURL* network::internal_state::curl() const noexcept {
-        return curl_;
+    void network::internal_state::enque(curl_http_request_uptr value) noexcept {
+        value->enque(curl_);
+        requests_.insert_or_assign(value->curl(), std::move(value));
     }
 
-    CURLSH* network::internal_state::curl_shared() const noexcept {
-        return curl_shared_;
+    void network::internal_state::tick() {
+        int num_handles = -1;
+        curl_multi_perform(curl_, &num_handles);
+        if ( num_handles == int(requests_.size()) ) {
+            return;
+        }
+        for (;;) {
+            int msgs_in_queue = 0;
+            CURLMsg* msg = curl_multi_info_read(curl_, &msgs_in_queue);
+            if ( !msg || msg->msg != CURLMSG_DONE ) {
+                break;
+            }
+            auto request = requests_.find(msg->easy_handle);
+            if ( request != requests_.end() ) {
+                request->second->complete(curl_);
+                requests_.erase(request);
+            }
+        }
     }
-
 }
 
 #endif

@@ -14,20 +14,27 @@
 namespace e2d
 {
     //
-    // http_response:internal_state
+    // curl_http_request
     //
 
-    class http_response::internal_state final : private e2d::noncopyable {
+    class curl_http_request final : private e2d::noncopyable {
     public:
-        internal_state(
+        curl_http_request(
             debug& debug,
-            http_request&& request);
-        ~internal_state() noexcept;
+            str_view url,
+            const flat_map<str, str>& headers,
+            http_request::method method,
+            secf timeout,
+            http_request::content_t &&content,
+            output_stream_uptr &&stream,
+            stdex::promise<http_response> result);
+        ~curl_http_request() noexcept;
     public:
         [[nodiscard]] debug& dbg() const noexcept;
         [[nodiscard]] CURL* curl() const noexcept;
-        void add(CURLSH*) noexcept;
-        void remove(CURLSH*) noexcept;
+        [[nodiscard]] bool is_complete() noexcept;
+        void enque(CURLSH*) noexcept;
+        void complete(CURLSH*) noexcept;
     private:
         static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);
         static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata);
@@ -35,14 +42,21 @@ namespace e2d
         static size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata);
         static int debug_callback(CURL *handle, curl_infotype type, char *data, size_t size, void *userptr);
     private:
+        // request
+        const secf timeout_;
+        const http_request::content_t content_;
+        //
+        debug& debug_;
         CURL* curl_;
         curl_slist* slist_;
-        http_request request_;
         CURLMcode add_to_curlm_;
         std::atomic<int> sent_;
-        flat_map<str, str> headers_;
-        std::vector<u8> content_;
-        debug& debug_;
+        std::atomic<bool> canceled_;
+        // response
+        flat_map<str, str> response_headers_;
+        std::vector<u8> response_content_;
+        output_stream_uptr response_stream_;
+        stdex::promise<http_response> result_;
     };
 
     //
@@ -55,13 +69,17 @@ namespace e2d
             debug& debug);
         ~internal_state() noexcept;
     public:
+        using curl_http_request_uptr = std::unique_ptr<curl_http_request>;
+        void enque(curl_http_request_uptr) noexcept;
+        void tick();
         [[nodiscard]] debug& dbg() const noexcept;
-        [[nodiscard]] CURLM* curl() const noexcept;
-        [[nodiscard]] CURLSH* curl_shared() const noexcept;
     private:
         CURLM* curl_;
         CURLSH* curl_shared_;
         debug& debug_;
+
+        using requests_t = hash_map<CURL*, curl_http_request_uptr>;
+        requests_t requests_;
     };
 }
 
