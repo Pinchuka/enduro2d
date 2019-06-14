@@ -33,8 +33,8 @@ namespace e2d
         [[nodiscard]] debug& dbg() const noexcept;
         [[nodiscard]] CURL* curl() const noexcept;
         [[nodiscard]] bool is_complete() noexcept;
-        void enque(CURLSH*) noexcept;
-        void complete(CURLSH*, CURLcode) noexcept;
+        void enque(CURLM*) noexcept;
+        void complete(CURLM*, CURLcode) noexcept;
     private:
         static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);
         static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata);
@@ -75,12 +75,13 @@ namespace e2d
         void tick();
         [[nodiscard]] debug& dbg() const noexcept;
     private:
+        using requests_t = flat_map<CURL*, curl_http_request_uptr>;
+        requests_t requests_;
         CURLM* curl_;
         CURLSH* curl_shared_;
         debug& debug_;
-
-        using requests_t = flat_map<CURL*, curl_http_request_uptr>;
-        requests_t requests_;
+        std::atomic<bool> exit_;
+        std::thread thread_;
     };
 }
 

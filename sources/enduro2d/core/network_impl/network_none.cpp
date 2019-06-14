@@ -31,13 +31,16 @@ namespace e2d
     network::~network() noexcept {
     }
 
-    stdex::promise<http_response> network::send(http_request) {
+    stdex::promise<http_response> network::send(http_request&&) {
         stdex::promise<http_response> result;
         return result;
     }
 
-    void network::tick() {
+    stdex::promise<http_response> network::send(http_request&) {
+        stdex::promise<http_response> result;
+        return result;
     }
+
 }
 
 #endif

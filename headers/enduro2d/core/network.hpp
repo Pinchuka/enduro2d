@@ -106,7 +106,6 @@ namespace e2d
 
         [[nodiscard]] stdex::promise<http_response> send(http_request&&);
         [[nodiscard]] stdex::promise<http_response> send(http_request&);
-        void tick();
     private:
         class internal_state;
         std::unique_ptr<internal_state> state_;

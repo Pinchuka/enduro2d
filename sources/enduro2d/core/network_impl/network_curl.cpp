@@ -41,7 +41,6 @@ namespace e2d
         output_stream_uptr tmp_stream;
         std::swap(req.content_, tmp_content);
         std::swap(req.output_stream_, tmp_stream);
-
         stdex::promise<http_response> result;
         state_->enque(std::make_unique<curl_http_request>(
                 state_->dbg(),
@@ -54,10 +53,6 @@ namespace e2d
                 result
             ));
         return result;
-    }
-
-    void network::tick() {
-        state_->tick();
     }
 
 }

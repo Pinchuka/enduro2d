@@ -67,8 +67,9 @@ namespace
     class game final : public engine::application {
     public:
         bool initialize() final {
-            auto resp = the<network>().send(http_request(http_request::method::post)
+            auto resp = the<network>().send(http_request(http_request::method::get)
                 .url("https://media.githubusercontent.com/media/enduro2d/enduro2d/master/samples/bin/library/cube_0.png"));
+                
             auto& image_data = resp.get().content();
 
             shader_ = the<render>().create_shader(
