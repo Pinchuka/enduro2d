@@ -11,7 +11,11 @@ namespace e2d
     //
     // http_request
     //
-    
+
+    http_request::http_request(method m) noexcept
+    : method_(m) {
+    }
+
     http_request::http_request(str_view u, method m) noexcept
     : url_(u)
     , method_(m) {
@@ -81,6 +85,26 @@ namespace e2d
         return *this;
     }
 
+    http_request& http_request::url(const char* value) noexcept {
+        url_ = value;
+        return *this;
+    }
+
+    http_request& http_request::url(str_view value) noexcept {
+        url_ = value;
+        return *this;
+    }
+
+    http_request& http_request::url(const e2d::url& value) noexcept {
+        url_ = value.schemepath();
+        return *this;
+    }
+
+    http_request& http_request::url(str&& value) noexcept {
+        url_ = std::move(value);
+        return *this;
+    }
+
     const http_request::data_t& http_request::content_data() const {
         return stdex::get<data_t>(content_);
     }
@@ -114,13 +138,23 @@ namespace e2d
     //
 
     http_response::http_response(
+        u16 status,
         flat_map<str, str>&& headers,
         std::vector<u8>&& content)
     : headers_(headers)
-    , content_(content) {}
+    , content_(content)
+    , status_(status) {}
 
-    u16 http_response::status_code() const {
-        return 0;   // TODO
+    u16 http_response::status_code() const noexcept {
+        return status_;
+    }
+
+    const std::vector<u8>& http_response::content() const noexcept {
+        return content_;
+    }
+
+    const flat_map<str, str>& http_response::headers() const noexcept {
+        return headers_;
     }
 }
 

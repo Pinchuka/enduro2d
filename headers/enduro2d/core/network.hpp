@@ -37,9 +37,11 @@ namespace e2d
         using data_t = std::vector<u8>;
         using content_t = stdex::variant<stdex::monostate, data_t, input_stream_uptr>;
     public:
+        explicit http_request(method) noexcept;
         http_request(str_view, method) noexcept;
         http_request(const e2d::url&, method) noexcept;
         http_request(str&&, method) noexcept;
+        http_request(http_request&&) = default;
         http_request& timeout(secf value) noexcept;
         http_request& header(const str&, const str&) noexcept;
         http_request& content(output_stream_uptr) noexcept;
@@ -49,6 +51,10 @@ namespace e2d
         http_request& content(const void* data, std::size_t size) noexcept;
         http_request& append_content(buffer_view value) noexcept;
         http_request& output_stream(output_stream_uptr) noexcept;
+        http_request& url(const char*) noexcept;
+        http_request& url(str_view) noexcept;
+        http_request& url(const e2d::url&) noexcept;
+        http_request& url(str&&) noexcept;
         [[nodiscard]] secf timeout() const noexcept;
         [[nodiscard]] const str& url() const noexcept;
         [[nodiscard]] const flat_map<str, str>& headers() const noexcept;
@@ -77,12 +83,16 @@ namespace e2d
     class http_response final {
     public:
         http_response(
+            u16 status,
             flat_map<str, str>&& headers,
             std::vector<u8>&& content);
-        [[nodiscard]] u16 status_code() const;
+        [[nodiscard]] u16 status_code() const noexcept;
+        [[nodiscard]] const std::vector<u8>& content() const noexcept;
+        [[nodiscard]] const flat_map<str, str>& headers() const noexcept;
     private:
         flat_map<str, str> headers_;
         std::vector<u8> content_;
+        u16 status_;
     };
 
     //
@@ -94,7 +104,8 @@ namespace e2d
         network(debug& d);
         ~network() noexcept;
 
-        [[nodiscard]] stdex::promise<http_response> send(http_request);
+        [[nodiscard]] stdex::promise<http_response> send(http_request&&);
+        [[nodiscard]] stdex::promise<http_response> send(http_request&);
         void tick();
     private:
         class internal_state;

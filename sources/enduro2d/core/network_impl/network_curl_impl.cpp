@@ -29,7 +29,8 @@ namespace e2d
     , slist_(nullptr)
     , add_to_curlm_(CURLM_LAST)
     , response_stream_(std::move(stream))
-    , result_(result) {
+    , result_(result)
+    , respose_code_(0) {
         curl_ = curl_easy_init();
         curl_easy_setopt(curl_, CURLOPT_DEBUGDATA, this);
         curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, &debug_callback);
@@ -83,6 +84,10 @@ namespace e2d
                 curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, nullptr);
                 curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_stream_callback);
             }
+            else if ( stdex::holds_alternative<stdex::monostate>(content_) ) {
+                curl_easy_setopt(curl_, CURLOPT_POSTFIELDSIZE, -1);
+                curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, "");
+            }
             else {
                 throw bad_network_operation();
             }
@@ -112,6 +117,7 @@ namespace e2d
         result_.except([this](std::exception_ptr) {
             canceled_.store(true);
             return http_response(
+                    respose_code_,
                     std::move(response_headers_),
                     std::move(response_content_));
         });
@@ -133,9 +139,16 @@ namespace e2d
         add_to_curlm_ = curl_multi_add_handle(curlm, curl_);
     }
 
-    void curl_http_request::complete(CURLSH* curlm) noexcept {
+    void curl_http_request::complete(CURLSH* curlm, CURLcode code) noexcept {
         curl_multi_remove_handle(curlm, curl_);
         add_to_curlm_ = CURLM_LAST;
+
+        if ( code == CURLE_OK ) {
+            long response_code = 0;
+            if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK ) {
+                respose_code_ = math::numeric_cast<u16>(response_code);
+            }
+        }
     }
 
     debug& curl_http_request::dbg() const noexcept {
@@ -148,6 +161,9 @@ namespace e2d
 
     size_t curl_http_request::read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
         auto* self = static_cast<curl_http_request *>(userdata);
+        if ( self->canceled_.load() ) {
+            return CURLE_ABORTED_BY_CALLBACK;
+        }
         auto& src = stdex::get<http_request::data_t>(self->content_);
         size_t offset = self->sent_.load();
         size_t required = size * nitems;
@@ -162,6 +178,9 @@ namespace e2d
 
     size_t curl_http_request::read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
         auto* self = static_cast<curl_http_request *>(userdata);
+        if ( self->canceled_.load() ) {
+            return CURLE_ABORTED_BY_CALLBACK;
+        }
         auto& src = stdex::get<input_stream_uptr>(self->content_);
         size_t offset = self->sent_.load();
         E2D_ASSERT(offset == src->tell());
@@ -173,6 +192,9 @@ namespace e2d
 
     size_t curl_http_request::header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
         auto* self = static_cast<curl_http_request *>(userdata);
+        if ( self->canceled_.load() ) {
+            return 0;
+        }
         size_t header_size = size * nitems;
         if ( header_size > 0 && header_size <= CURL_MAX_HTTP_HEADER ) {
             str_view header(buffer, header_size);
@@ -188,6 +210,9 @@ namespace e2d
 
     size_t curl_http_request::write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
         auto* self = static_cast<curl_http_request *>(userdata);
+        if ( self->canceled_.load() ) {
+            return 0;
+        }
         size_t buffer_size = size * nmemb;
         size_t offset = self->response_content_.size();
         if ( buffer_size == 0 )
@@ -297,6 +322,7 @@ namespace e2d
         if ( num_handles == int(requests_.size()) ) {
             return;
         }
+        // remove completed requests
         for (;;) {
             int msgs_in_queue = 0;
             CURLMsg* msg = curl_multi_info_read(curl_, &msgs_in_queue);
@@ -305,7 +331,7 @@ namespace e2d
             }
             auto request = requests_.find(msg->easy_handle);
             if ( request != requests_.end() ) {
-                request->second->complete(curl_);
+                request->second->complete(curl_, msg->data.result);
                 requests_.erase(request);
             }
         }

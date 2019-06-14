@@ -34,7 +34,7 @@ namespace e2d
         [[nodiscard]] CURL* curl() const noexcept;
         [[nodiscard]] bool is_complete() noexcept;
         void enque(CURLSH*) noexcept;
-        void complete(CURLSH*) noexcept;
+        void complete(CURLSH*, CURLcode) noexcept;
     private:
         static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);
         static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata);
@@ -57,6 +57,7 @@ namespace e2d
         std::vector<u8> response_content_;
         output_stream_uptr response_stream_;
         stdex::promise<http_response> result_;
+        u16 respose_code_;
     };
 
     //
@@ -78,7 +79,7 @@ namespace e2d
         CURLSH* curl_shared_;
         debug& debug_;
 
-        using requests_t = hash_map<CURL*, curl_http_request_uptr>;
+        using requests_t = flat_map<CURL*, curl_http_request_uptr>;
         requests_t requests_;
     };
 }
