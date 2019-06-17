@@ -67,15 +67,32 @@ namespace
     class game final : public engine::application {
     public:
         bool initialize() final {
-            auto resp = the<network>().send(http_request(http_request::method::get)
-                .url("https://media.githubusercontent.com/media/enduro2d/enduro2d/master/samples/bin/library/cube_0.png"));
-                
-            auto& image_data = resp.get().content();
+            the<vfs>().register_scheme<archive_file_source>(
+                "piratepack",
+                the<vfs>().read(url("resources://bin/kenney_piratepack.zip")));
+
+            the<vfs>().register_scheme_alias(
+                "ships",
+                url("piratepack://PNG/Retina/Ships"));
+
+            the<network>().send(http_request(http_request::method::get)
+                .url("https://media.githubusercontent.com/media/enduro2d/enduro2d/master/samples/bin/library/cube_0.png"))
+                .handler().then([this](http_response resp) {
+                    the<deferrer>().do_in_main_thread([this, resp]() {
+                        texture1_ = the<render>().create_texture(
+                            make_memory_stream(buffer(resp.content().data(), resp.content().size())));
+                        material_.pass(0).properties()
+                            .sampler("u_texture1", render::sampler_state()
+                                .texture(texture1_)
+                                .min_filter(render::sampler_min_filter::linear)
+                                .mag_filter(render::sampler_mag_filter::linear));
+                    });
+                });
 
             shader_ = the<render>().create_shader(
                 vs_source_cstr, fs_source_cstr);
             texture1_ = the<render>().create_texture(
-                make_memory_stream(buffer(image_data.data(), image_data.size())));
+                the<vfs>().read(url("ships://ship (2).png")));
 
             if ( !shader_ || !texture1_ ) {
                 return false;

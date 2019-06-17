@@ -270,7 +270,7 @@ namespace e2d
                                           size_t size,
                                           void *userptr) {
         auto* self = static_cast<curl_http_request *>(userptr);
-        E2D_ASSERT(handle == self->curl());
+        E2D_ASSERT(self == nullptr || handle == self->curl());
         switch (type)
         {
         case CURLINFO_TEXT :
