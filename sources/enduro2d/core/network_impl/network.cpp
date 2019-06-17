@@ -63,6 +63,11 @@ namespace e2d
         return *this;
     }
 
+    http_request& http_request::content(input_stream_uptr value) {
+        edit_content_stream() = std::move(value);
+        return *this;
+    }
+
     http_request& http_request::content(buffer_view value) {
         edit_content_data().assign((u8*)value.data(), (u8*)value.data() + value.size());
         return *this;
@@ -171,6 +176,12 @@ namespace e2d
         if ( state_->status_.load() == status::pending )
             throw http_response_not_ready();
         return state_->content_;
+    }
+
+    str_view http_response::content_as_str() const {
+        if ( state_->status_.load() == status::pending )
+            throw http_response_not_ready();
+        return str_view((char*)state_->content_.data(), state_->content_.size());
     }
 
     const flat_map<str, str>& http_response::headers() const {

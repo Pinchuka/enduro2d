@@ -56,6 +56,8 @@ namespace e2d
         timeout_after_last_response = 0x1003,
         // http codes
         ok = 200,
+        moved_permanently = 301,
+        request_timeout = 408,
         // TODO
     };
 
@@ -82,7 +84,7 @@ namespace e2d
         http_request& timeout(secf value) noexcept;
         http_request& timeout(f32 value) noexcept;
         http_request& header(const str&, const str&);
-        http_request& content(output_stream_uptr);
+        http_request& content(input_stream_uptr);
         http_request& content(buffer_view value);
         http_request& content(str_view value);
         http_request& content(data_t&& value);
@@ -152,6 +154,7 @@ namespace e2d
         [[nodiscard]] bool canceled() const noexcept;
         [[nodiscard]] http_code status_code() const;
         [[nodiscard]] const std::vector<u8>& content() const;
+        [[nodiscard]] str_view content_as_str() const;
         [[nodiscard]] const flat_map<str, str>& headers() const;
     private:
         internal_state_ptr state_;
