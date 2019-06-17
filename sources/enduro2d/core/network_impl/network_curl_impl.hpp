@@ -34,7 +34,8 @@ namespace e2d
         [[nodiscard]] CURL* curl() const noexcept;
         [[nodiscard]] bool is_complete() noexcept;
         void enque(CURLM*) noexcept;
-        void complete(CURLM*, CURLcode) noexcept;
+        void complete(CURLM*, CURLcode);
+        void cancel() noexcept;
     private:
         static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);
         static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata);
@@ -49,15 +50,18 @@ namespace e2d
         debug& debug_;
         CURL* curl_;
         curl_slist* slist_;
-        CURLMcode add_to_curlm_;
+        CURLMcode add_to_curlm_result_;
+        CURLcode completion_result_;
+        http_code http_code_;
         std::atomic<int> sent_;
         std::atomic<bool> canceled_;
         // response
+        using time_point_t = std::chrono::high_resolution_clock::time_point;
+        time_point_t last_response_time_;
         flat_map<str, str> response_headers_;
         std::vector<u8> response_content_;
         output_stream_uptr response_stream_;
         stdex::promise<http_response> result_;
-        u16 respose_code_;
     };
 
     //
@@ -71,7 +75,7 @@ namespace e2d
         ~internal_state() noexcept;
     public:
         using curl_http_request_uptr = std::unique_ptr<curl_http_request>;
-        void enque(curl_http_request_uptr) noexcept;
+        void enque(curl_http_request_uptr);
         void tick();
         [[nodiscard]] debug& dbg() const noexcept;
     private:

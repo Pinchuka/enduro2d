@@ -16,12 +16,17 @@ namespace e2d
     : method_(m) {
     }
 
-    http_request::http_request(str_view u, method m) noexcept
+    http_request::http_request(const char* u, method m)
     : url_(u)
     , method_(m) {
     }
 
-    http_request::http_request(const e2d::url& u, method m) noexcept
+    http_request::http_request(str_view u, method m)
+    : url_(u)
+    , method_(m) {
+    }
+
+    http_request::http_request(const e2d::url& u, method m)
     : url_(u.schemepath())
     , method_(m) {
     }
@@ -48,33 +53,38 @@ namespace e2d
         return *this;
     }
 
-    http_request& http_request::header(const str& key, const str& value) noexcept {
+    http_request& http_request::timeout(f32 value) noexcept {
+        timeout_ = secf(value);
+        return *this;
+    }
+
+    http_request& http_request::header(const str& key, const str& value) {
         headers_.insert({key, value});
         return *this;
     }
 
-    http_request& http_request::content(buffer_view value) noexcept {
+    http_request& http_request::content(buffer_view value) {
         edit_content_data().assign((u8*)value.data(), (u8*)value.data() + value.size());
         return *this;
     }
 
-    http_request& http_request::content(str_view value) noexcept {
+    http_request& http_request::content(str_view value) {
         edit_content_data().assign(value.begin(), value.end());
         return *this;
     }
 
-    http_request& http_request::content(data_t&& value) noexcept {
+    http_request& http_request::content(data_t&& value) {
         edit_content_data() = std::move(value);
         return *this;
     }
 
-    http_request& http_request::content(const void* data, std::size_t size) noexcept {
+    http_request& http_request::content(const void* data, std::size_t size) {
         E2D_ASSERT(data && size);
         edit_content_data().assign((u8*)data, (u8*)data + size);
         return *this;
     }
 
-    http_request& http_request::append_content(buffer_view value) noexcept {
+    http_request& http_request::append_content(buffer_view value) {
         data_t& d = edit_content_data();
         d.insert(d.end(), (u8*)value.data(), (u8*)value.data() + value.size());
         return *this;
@@ -85,17 +95,17 @@ namespace e2d
         return *this;
     }
 
-    http_request& http_request::url(const char* value) noexcept {
+    http_request& http_request::url(const char* value) {
         url_ = value;
         return *this;
     }
 
-    http_request& http_request::url(str_view value) noexcept {
+    http_request& http_request::url(str_view value) {
         url_ = value;
         return *this;
     }
 
-    http_request& http_request::url(const e2d::url& value) noexcept {
+    http_request& http_request::url(const e2d::url& value) {
         url_ = value.schemepath();
         return *this;
     }
@@ -138,14 +148,14 @@ namespace e2d
     //
 
     http_response::http_response(
-        u16 status,
+        http_code status,
         flat_map<str, str>&& headers,
         std::vector<u8>&& content)
     : headers_(headers)
     , content_(content)
     , status_(status) {}
 
-    u16 http_response::status_code() const noexcept {
+    http_code http_response::status_code() const noexcept {
         return status_;
     }
 

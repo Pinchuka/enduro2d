@@ -27,10 +27,11 @@ namespace e2d
     , content_(std::move(content))
     , debug_(debug)
     , slist_(nullptr)
-    , add_to_curlm_(CURLM_LAST)
+    , add_to_curlm_result_(CURLM_OK)
+    , completion_result_(CURLE_OK)
+    , http_code_(http_code::Unknwon)
     , response_stream_(std::move(stream))
-    , result_(result)
-    , respose_code_(0) {
+    , result_(result) {
         curl_ = curl_easy_init();
         curl_easy_setopt(curl_, CURLOPT_DEBUGDATA, this);
         curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, &debug_callback);
@@ -118,10 +119,11 @@ namespace e2d
         //curl_easy_setopt(curl_, CURLOPT_ACCEPT_ENCODING, "");
 
         canceled_.store(false);
-        result_.except([this](std::exception_ptr) {
+        result_.except([this](std::exception_ptr e) {
             canceled_.store(true);
+            std::rethrow_exception(e);
             return http_response(
-                    respose_code_,
+                    http_code_,
                     std::move(response_headers_),
                     std::move(response_content_));
         });
@@ -140,26 +142,28 @@ namespace e2d
     }
 
     void curl_http_request::enque(CURLM* curlm) noexcept {
-        add_to_curlm_ = curl_multi_add_handle(curlm, curl_);
+        last_response_time_ = time_point_t::clock::now();
+        add_to_curlm_result_ = curl_multi_add_handle(curlm, curl_);
     }
 
-    void curl_http_request::complete(CURLM* curlm, CURLcode code) noexcept {
-        if ( add_to_curlm_ == CURLM_OK ) {
+    void curl_http_request::complete(CURLM* curlm, CURLcode code) {
+        if ( add_to_curlm_result_ == CURLM_OK ) {
             curl_multi_remove_handle(curlm, curl_);
         }
-        add_to_curlm_ = CURLM_LAST;
-
-        if ( code == CURLE_OK ) {
-            long response_code = 0;
-            if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK ) {
-                respose_code_ = math::numeric_cast<u16>(response_code);
-            }
+        completion_result_ = code;
+        long response_code = 0;
+        if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK ) {
+            http_code_ = http_code(response_code);
         }
         result_.resolve(http_response(
-            respose_code_,
+            http_code_,
             std::move(response_headers_),
             std::move(response_content_)
         ));
+    }
+
+    void curl_http_request::cancel() noexcept {
+        // TODO
     }
 
     debug& curl_http_request::dbg() const noexcept {
@@ -206,6 +210,7 @@ namespace e2d
         if ( self->canceled_.load() ) {
             return 0;
         }
+        self->last_response_time_ = time_point_t::clock::now();
         size_t header_size = size * nitems;
         if ( header_size > 0 && header_size <= CURL_MAX_HTTP_HEADER ) {
             str header(buffer, header_size);
@@ -228,6 +233,7 @@ namespace e2d
         if ( self->canceled_.load() ) {
             return 0;
         }
+        self->last_response_time_ = time_point_t::clock::now();
         size_t buffer_size = size * nmemb;
         size_t offset = self->response_content_.size();
         if ( buffer_size == 0 )
@@ -283,7 +289,10 @@ namespace e2d
         if ( canceled_.load() )
             return true;
 
-        if ( add_to_curlm_ != CURLM_OK )
+        if ( add_to_curlm_result_ != CURLM_OK )
+            return true;
+
+        if ( completion_result_ != CURLE_OK )
             return true;
 
         // TODO: check timeout
@@ -330,6 +339,11 @@ namespace e2d
         exit_ = true;
         thread_.join();
 
+        for (auto& request : requests_) {
+            request.second->cancel();
+        }
+        requests_.clear();
+
         if ( curl_ ) {
             curl_multi_cleanup(curl_);
             curl_ = nullptr;
@@ -345,7 +359,7 @@ namespace e2d
         return debug_;
     }
 
-    void network::internal_state::enque(curl_http_request_uptr value) noexcept {
+    void network::internal_state::enque(curl_http_request_uptr value) {
         value->enque(curl_);
         requests_.insert_or_assign(value->curl(), std::move(value));
     }
@@ -370,6 +384,15 @@ namespace e2d
             if ( request != requests_.end() ) {
                 request->second->complete(curl_, msg->data.result);
                 requests_.erase(request);
+            }
+        }
+        // update active requests
+        for (auto request = requests_.begin(); request != requests_.end();) {
+            if ( request->second->is_complete() ) {
+                request->second->complete(curl_, CURLE_OK);
+                request = requests_.erase(request);
+            } else {
+                ++request;
             }
         }
     }
