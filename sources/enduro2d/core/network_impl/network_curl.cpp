@@ -29,6 +29,7 @@ namespace e2d
                 req.headers(),
                 req.type(),
                 req.timeout(),
+                req.redirections(),
                 std::move(req.content_),
                 std::move(req.output_stream_),
                 response
@@ -48,6 +49,7 @@ namespace e2d
                 req.headers(),
                 req.type(),
                 req.timeout(),
+                req.redirections(),
                 std::move(tmp_content),
                 std::move(tmp_stream),
                 response

@@ -115,6 +115,11 @@ namespace e2d
         return *this;
     }
 
+    http_request& http_request::redirections(u32 count) noexcept {
+        max_redirections_ = count;
+        return *this;
+    }
+
     const http_request::data_t& http_request::content_data() const {
         return stdex::get<data_t>(content_);
     }
@@ -143,12 +148,18 @@ namespace e2d
         return method_;
     }
 
+    u32 http_request::redirections() const noexcept {
+        return max_redirections_;
+    }
+
     //
     // http_response
     //
 
     http_response::http_response(internal_state_ptr ptr) noexcept
-    : state_(ptr) {}
+    : state_(ptr) {
+        E2D_ASSERT(ptr);
+    }
 
     http_code http_response::status_code() const {
         if ( state_->status_.load() == status::pending )

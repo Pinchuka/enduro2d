@@ -31,14 +31,12 @@ namespace e2d
     network::~network() noexcept {
     }
 
-    stdex::promise<http_response> network::send(http_request&&) {
-        stdex::promise<http_response> result;
-        return result;
+    http_response network::send(http_request&&) {
+        return http_response(std::make_shared<http_response::internal_state>());
     }
 
-    stdex::promise<http_response> network::send(http_request&) {
-        stdex::promise<http_response> result;
-        return result;
+    http_response network::send(http_request&) {
+        return http_response(std::make_shared<http_response::internal_state>());
     }
 
 }

@@ -20,11 +20,13 @@ namespace e2d
         const flat_map<str, str>& headers,
         http_request::method method,
         secf timeout,
+        u32 maxRedirections,
         http_request::content_t &&content,
         output_stream_uptr &&stream,
         const response_t& result)
     : timeout_(timeout)
     , content_(std::move(content))
+    , url_(url)
     , debug_(debug)
     , slist_(nullptr)
     , add_to_curlm_result_(CURLM_OK)
@@ -37,13 +39,19 @@ namespace e2d
         curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, &debug_callback);
         curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
         curl_easy_setopt(curl_, CURLOPT_BUFFERSIZE, 64*1024);
-        //curl_easy_setopt(curl_, CURLOPT_SHARE, );
         curl_easy_setopt(curl_, CURLOPT_USE_SSL, CURLUSESSL_ALL);
-        curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
         curl_easy_setopt(curl_, CURLOPT_PRIVATE, this);
         //curl_easy_setopt(curl_, CURLOPT_PROXY, );
         curl_easy_setopt(curl_, CURLOPT_NOPROGRESS, 1L);
+
+        if ( maxRedirections ) {
+            curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 1L);
+            curl_easy_setopt(curl_, CURLOPT_MAXREDIRS, maxRedirections);
+        } else {
+            // disable redirections
+            curl_easy_setopt(curl_, CURLOPT_FOLLOWLOCATION, 0L);
+        }
 
         // TODO: for SSL
         if ( true ) {
@@ -70,6 +78,7 @@ namespace e2d
                 curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_data_callback);
             }
             else if ( !stdex::holds_alternative<stdex::monostate>(content_) ) {
+                dbg().warning("unsupported content type for http get request");
                 throw bad_http_request();
             }
             break;
@@ -89,6 +98,7 @@ namespace e2d
                 curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, nullptr);
             }
             else {
+                dbg().warning("unsupported content type for http post request");
                 throw bad_http_request();
             }
             break;
@@ -129,8 +139,9 @@ namespace e2d
         }
     }
 
-    void curl_http_request::enque(CURLM* curlm) noexcept {
+    void curl_http_request::enque(CURLM* curlm, CURLSH* shared) noexcept {
         last_response_time_ = time_point_t::clock::now();
+        curl_easy_setopt(curl_, CURLOPT_SHARE, shared);
         add_to_curlm_result_ = curl_multi_add_handle(curlm, curl_);
     }
 
@@ -161,6 +172,10 @@ namespace e2d
         }
         if ( expected == status::pending ) {
             result_->handler_.resolve(http_response(result_));
+        }
+
+        if ( http_code_ != http_code::ok ) {
+            dbg().warning("http request code: ($0), url: (%1), curl error: (%2)", int(http_code_), url_, curl_easy_strerror(completion_result_));
         }
     }
 
@@ -303,10 +318,11 @@ namespace e2d
         if ( completion_result_ != CURLE_OK ) {
             return true;
         }
-        constexpr auto response_timeout = std::chrono::seconds(30); // TODO
+        constexpr auto response_timeout = std::chrono::seconds(60);
         auto dt = time_point_t::clock::now() - last_response_time_;
         if ( dt > response_timeout ) {
-            dbg().warning("TODO");
+            http_code_ = http_code::timeout_after_last_response;
+            dbg().warning("http request timed out, url (%0)", url_);
             return true;
         }
         return false;
@@ -330,13 +346,13 @@ namespace e2d
         curl_share_setopt(curl_shared_, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
         curl_share_setopt(curl_shared_, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
 
-        exit_ = false;
+        exit_.store(false);
         thread_ = std::thread([this] () {
             using namespace std::chrono ;
             using time_point_t = high_resolution_clock::time_point;
             using nonos = std::chrono::nanoseconds;
             constexpr nonos min_frame_time = duration_cast<nonos>(std::chrono::milliseconds(10));
-            while ( !exit_ ) {
+            while ( !exit_.load() ) {
                 try {
                     auto begin_time = time_point_t::clock::now();
                     tick();
@@ -352,7 +368,7 @@ namespace e2d
     }
 
     network::internal_state::~internal_state() noexcept {
-        exit_ = true;
+        exit_.store(true);
         thread_.join();
         try {
             for (auto& request : requests_) {
@@ -377,7 +393,7 @@ namespace e2d
     }
 
     void network::internal_state::enque(curl_http_request_uptr value) {
-        value->enque(curl_);
+        value->enque(curl_, curl_shared_);
         requests_.insert_or_assign(value->curl(), std::move(value));
     }
 

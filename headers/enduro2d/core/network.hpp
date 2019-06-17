@@ -49,9 +49,12 @@ namespace e2d
     // http_code
     //
     enum class http_code : u16 {
+        // non-http codes
         unknown = 0xFFFF,
         operation_timeout = 0x1001,
         connection_error = 0x1002,
+        timeout_after_last_response = 0x1003,
+        // http codes
         ok = 200,
         // TODO
     };
@@ -90,6 +93,7 @@ namespace e2d
         http_request& url(str_view);
         http_request& url(const e2d::url&);
         http_request& url(str&&) noexcept;
+        http_request& redirections(u32 count) noexcept;
         [[nodiscard]] secf timeout() const noexcept;
         [[nodiscard]] const str& url() const noexcept;
         [[nodiscard]] const flat_map<str, str>& headers() const noexcept;
@@ -97,6 +101,7 @@ namespace e2d
         [[nodiscard]] const data_t& content_data() const; // throw(stdex::bad_variant_access)
         [[nodiscard]] const input_stream_uptr& content_stream() const; // throw(stdex::bad_variant_access)
         [[nodiscard]] const output_stream_uptr& output_stream() const noexcept;
+        [[nodiscard]] u32 redirections() const noexcept;
     private:
         [[nodiscard]] data_t& edit_content_data() noexcept;
         [[nodiscard]] input_stream_uptr& edit_content_stream() noexcept;
@@ -105,6 +110,7 @@ namespace e2d
         method method_;
         flat_map<str, str> headers_;
         secf timeout_;
+        u32 max_redirections_ {~0u}; // default - unlimited number of redirections
     private:
         friend class network;
         content_t content_;
@@ -136,7 +142,8 @@ namespace e2d
         using internal_state_ptr = std::shared_ptr<internal_state>;
         using status = internal_state::status;
     public:
-        http_response() = default;
+        http_response(const http_response&) = default;
+        http_response(http_response&&) = default;
         http_response(internal_state_ptr) noexcept;
         bool cancel() const;
         void wait() const;

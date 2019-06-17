@@ -28,6 +28,7 @@ namespace e2d
             const flat_map<str, str>& headers,
             http_request::method method,
             secf timeout,
+            u32 maxRedirections,
             http_request::content_t &&content,
             output_stream_uptr &&stream,
             const response_t& response);
@@ -36,7 +37,7 @@ namespace e2d
         [[nodiscard]] debug& dbg() const noexcept;
         [[nodiscard]] CURL* curl() const noexcept;
         [[nodiscard]] bool is_complete() noexcept;
-        void enque(CURLM*) noexcept;
+        void enque(CURLM*, CURLSH* shared) noexcept;
         void complete(CURLM*, CURLcode);
         void cancel();
     private:
@@ -50,6 +51,7 @@ namespace e2d
         // request
         const secf timeout_;
         const http_request::content_t content_;
+        const str url_;
         //
         debug& debug_;
         CURL* curl_;
