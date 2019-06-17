@@ -29,7 +29,7 @@ namespace e2d
     , slist_(nullptr)
     , add_to_curlm_result_(CURLM_OK)
     , completion_result_(CURLE_OK)
-    , http_code_(http_code::Unknwon)
+    , http_code_(http_code::Unknown)
     , response_stream_(std::move(stream))
     , result_(result) {
         curl_ = curl_easy_init();
@@ -143,14 +143,14 @@ namespace e2d
         if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK ) {
             http_code_ = http_code(response_code);
         }
-
         result_->status_code_ = http_code_;
 
         status expected = status::pending;
-        for (; !result_->status_.compare_exchange_weak(expected, status::ready);) {
+        for (; expected == status::pending && !result_->status_.compare_exchange_weak(expected, status::ready);) {
         }
-
-        E2D_ASSERT(expected == status::pending); // TODO: what to do if it was canceled?
+        if ( expected == status::pending ) {
+            result_->handler_.resolve(http_response(result_));
+        }
     }
 
     void curl_http_request::cancel() noexcept {
@@ -283,15 +283,15 @@ namespace e2d
     }
 
     bool curl_http_request::is_complete() noexcept {
-        if ( is_canceled() )
+        if ( is_canceled() ) {
             return true;
-
-        if ( add_to_curlm_result_ != CURLM_OK )
+        }
+        if ( add_to_curlm_result_ != CURLM_OK ) {
             return true;
-
-        if ( completion_result_ != CURLE_OK )
+        }
+        if ( completion_result_ != CURLE_OK ) {
             return true;
-
+        }
         // TODO: check timeout
 
         return false;

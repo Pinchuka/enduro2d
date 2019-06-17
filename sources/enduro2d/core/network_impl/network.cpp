@@ -147,7 +147,7 @@ namespace e2d
     // http_response
     //
 
-    http_response::http_response(internal_state_ptr ptr)
+    http_response::http_response(internal_state_ptr ptr) noexcept
     : state_(ptr) {}
 
     http_code http_response::status_code() const {
@@ -168,20 +168,19 @@ namespace e2d
         return state_->headers_;
     }
 
-    bool http_response::cancel() const noexcept {
+    bool http_response::cancel() const {
         status expected = status::pending;
-        for (; !state_->status_.compare_exchange_weak(expected, status::canceled);) {
+        for (; expected == status::pending && !state_->status_.compare_exchange_weak(expected, status::canceled);) {
         }
-        return expected == status::pending;
+        if ( expected == status::pending ) {
+            state_->handler_.reject(std::logic_error("canceled"));
+            return true;
+        }
+        return false; // was canceled or complete by another thread
     }
 
-    void http_response::wait() const noexcept {
-        for (int i = 0; state_->status_.load() == status::pending; ++i) {
-            if ( i > 2000 ) {
-                i = 0;
-                std::this_thread::yield();
-            }
-        }
+    void http_response::wait() const {
+        state_->handler_.wait();
     }
 
     bool http_response::ready() const noexcept {

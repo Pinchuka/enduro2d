@@ -49,7 +49,7 @@ namespace e2d
     // http_code
     //
     enum class http_code : u16 {
-        Unknwon = 0xFFFF,
+        Unknown = 0xFFFF,
         OK = 200,
         // TODO
     };
@@ -115,26 +115,30 @@ namespace e2d
 
     class http_response final {
     public:
+        using promise_t = stdex::promise<http_response>;
         class internal_state final : public std::enable_shared_from_this<internal_state> {
         public:
             enum class status {
-                pending,
-                ready,
-                canceled,
+                pending, // response data locked by network implementation
+                ready, // response data is readonly and available for all
+                canceled, // response data is readonly, but may be empty or incomplete
             };
             internal_state() = default;
         public:
             mutable std::atomic<status> status_ {status::pending};
             flat_map<str, str> headers_;
             std::vector<u8> content_;
-            http_code status_code_;
+            http_code status_code_ {http_code::Unknown};
+            promise_t handler_;
         };
         using internal_state_ptr = std::shared_ptr<internal_state>;
         using status = internal_state::status;
     public:
-        http_response(internal_state_ptr);
-        bool cancel() const noexcept;
-        void wait() const noexcept;
+        http_response() = default;
+        http_response(internal_state_ptr) noexcept;
+        bool cancel() const;
+        void wait() const;
+        [[nodiscard]] promise_t& handler() noexcept;
         [[nodiscard]] bool ready() const noexcept;
         [[nodiscard]] bool canceled() const noexcept;
         [[nodiscard]] http_code status_code() const;
