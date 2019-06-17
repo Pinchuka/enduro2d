@@ -29,7 +29,7 @@ namespace e2d
     , slist_(nullptr)
     , add_to_curlm_result_(CURLM_OK)
     , completion_result_(CURLE_OK)
-    , http_code_(http_code::Unknown)
+    , http_code_(http_code::unknown)
     , response_stream_(std::move(stream))
     , result_(result) {
         curl_ = curl_easy_init();
@@ -139,8 +139,19 @@ namespace e2d
             curl_multi_remove_handle(curlm, curl_);
         }
         completion_result_ = code;
+        switch (completion_result_)
+        {
+        case CURLE_OPERATION_TIMEDOUT :
+            http_code_ = http_code::operation_timeout;
+            break;
+        case CURLE_COULDNT_CONNECT :
+        case CURLE_COULDNT_RESOLVE_PROXY :
+        case CURLE_COULDNT_RESOLVE_HOST :
+            http_code_ = http_code::connection_error;
+            break;
+        }
         long response_code = 0;
-        if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK ) {
+        if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK && response_code != 0 ) {
             http_code_ = http_code(response_code);
         }
         result_->status_code_ = http_code_;
@@ -153,8 +164,8 @@ namespace e2d
         }
     }
 
-    void curl_http_request::cancel() noexcept {
-        // TODO
+    void curl_http_request::cancel() {
+        http_response(result_).cancel();
     }
 
     debug& curl_http_request::dbg() const noexcept {
@@ -292,8 +303,12 @@ namespace e2d
         if ( completion_result_ != CURLE_OK ) {
             return true;
         }
-        // TODO: check timeout
-
+        constexpr auto response_timeout = std::chrono::seconds(30); // TODO
+        auto dt = time_point_t::clock::now() - last_response_time_;
+        if ( dt > response_timeout ) {
+            dbg().warning("TODO");
+            return true;
+        }
         return false;
     }
 
@@ -339,12 +354,13 @@ namespace e2d
     network::internal_state::~internal_state() noexcept {
         exit_ = true;
         thread_.join();
-
-        for (auto& request : requests_) {
-            request.second->cancel();
+        try {
+            for (auto& request : requests_) {
+                request.second->cancel();
+            }
+            requests_.clear();
+        } catch(...) {
         }
-        requests_.clear();
-
         if ( curl_ ) {
             curl_multi_cleanup(curl_);
             curl_ = nullptr;

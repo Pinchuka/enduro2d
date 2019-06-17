@@ -49,8 +49,10 @@ namespace e2d
     // http_code
     //
     enum class http_code : u16 {
-        Unknown = 0xFFFF,
-        OK = 200,
+        unknown = 0xFFFF,
+        operation_timeout = 0x1001,
+        connection_error = 0x1002,
+        ok = 200,
         // TODO
     };
 
@@ -128,7 +130,7 @@ namespace e2d
             mutable std::atomic<status> status_ {status::pending};
             flat_map<str, str> headers_;
             std::vector<u8> content_;
-            http_code status_code_ {http_code::Unknown};
+            http_code status_code_ {http_code::unknown};
             promise_t handler_;
         };
         using internal_state_ptr = std::shared_ptr<internal_state>;

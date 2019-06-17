@@ -38,7 +38,7 @@ namespace e2d
         [[nodiscard]] bool is_complete() noexcept;
         void enque(CURLM*) noexcept;
         void complete(CURLM*, CURLcode);
-        void cancel() noexcept;
+        void cancel();
     private:
         [[nodiscard]] bool is_canceled() const noexcept;
         static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);

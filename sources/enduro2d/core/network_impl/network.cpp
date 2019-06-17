@@ -176,11 +176,15 @@ namespace e2d
             state_->handler_.reject(std::logic_error("canceled"));
             return true;
         }
-        return false; // was canceled or complete by another thread
+        return false; // was changed by another thread
     }
 
     void http_response::wait() const {
         state_->handler_.wait();
+    }
+
+    http_response::promise_t& http_response::handler() noexcept {
+        return state_->handler_;
     }
 
     bool http_response::ready() const noexcept {
