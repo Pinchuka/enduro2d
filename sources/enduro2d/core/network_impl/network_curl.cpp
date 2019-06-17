@@ -21,8 +21,8 @@ namespace e2d
     network::~network() noexcept {
     }
 
-    stdex::promise<http_response> network::send(http_request&& req) {
-        stdex::promise<http_response> result;
+    http_response network::send(http_request&& req) {
+        auto response = std::make_shared<http_response::internal_state>();
         state_->enque(std::make_unique<curl_http_request>(
                 state_->dbg(),
                 req.url(),
@@ -31,17 +31,17 @@ namespace e2d
                 req.timeout(),
                 std::move(req.content_),
                 std::move(req.output_stream_),
-                result
+                response
             ));
-        return result;
+        return http_response(response);
     }
 
-    stdex::promise<http_response> network::send(http_request& req) {
+    http_response network::send(http_request& req) {
         http_request::content_t tmp_content;
         output_stream_uptr tmp_stream;
         std::swap(req.content_, tmp_content);
         std::swap(req.output_stream_, tmp_stream);
-        stdex::promise<http_response> result;
+        auto response = std::make_shared<http_response::internal_state>();
         state_->enque(std::make_unique<curl_http_request>(
                 state_->dbg(),
                 req.url(),
@@ -50,9 +50,9 @@ namespace e2d
                 req.timeout(),
                 std::move(tmp_content),
                 std::move(tmp_stream),
-                result
+                response
             ));
-        return result;
+        return http_response(response);
     }
 
 }

@@ -18,6 +18,9 @@ namespace e2d
     //
 
     class curl_http_request final : private e2d::noncopyable {
+    private:
+        using response_t = http_response::internal_state_ptr;
+        using status = http_response::internal_state::status;
     public:
         curl_http_request(
             debug& debug,
@@ -27,7 +30,7 @@ namespace e2d
             secf timeout,
             http_request::content_t &&content,
             output_stream_uptr &&stream,
-            stdex::promise<http_response> result);
+            const response_t& response);
         ~curl_http_request() noexcept;
     public:
         [[nodiscard]] debug& dbg() const noexcept;
@@ -37,6 +40,7 @@ namespace e2d
         void complete(CURLM*, CURLcode);
         void cancel() noexcept;
     private:
+        [[nodiscard]] bool is_canceled() const noexcept;
         static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);
         static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata);
         static size_t header_callback(char *buffer, size_t size, size_t nitems, void *userdata);
@@ -53,15 +57,14 @@ namespace e2d
         CURLMcode add_to_curlm_result_;
         CURLcode completion_result_;
         http_code http_code_;
-        std::atomic<int> sent_;
-        std::atomic<bool> canceled_;
+        std::atomic<int> sent_; // TODO
         // response
         using time_point_t = std::chrono::high_resolution_clock::time_point;
         time_point_t last_response_time_;
-        flat_map<str, str> response_headers_;
-        std::vector<u8> response_content_;
+        //flat_map<str, str> response_headers_;
+        //std::vector<u8> response_content_;
         output_stream_uptr response_stream_;
-        stdex::promise<http_response> result_;
+        response_t result_;
     };
 
     //

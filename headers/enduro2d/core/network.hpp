@@ -24,6 +24,28 @@ namespace e2d
     };
 
     //
+    // bad_http_request
+    //
+
+    class bad_http_request final : public exception {
+    public:
+        const char* what() const noexcept final {
+            return "bad http request";
+        }
+    };
+
+    //
+    // http_response_not_ready
+    //
+
+    class http_response_not_ready final : public exception {
+    public:
+        const char* what() const noexcept final {
+            return "http response is not ready";
+        }
+    };
+
+    //
     // http_code
     //
     enum class http_code : u16 {
@@ -93,17 +115,33 @@ namespace e2d
 
     class http_response final {
     public:
-        http_response(
-            http_code status,
-            flat_map<str, str>&& headers,
-            std::vector<u8>&& content);
-        [[nodiscard]] http_code status_code() const noexcept;
-        [[nodiscard]] const std::vector<u8>& content() const noexcept;
-        [[nodiscard]] const flat_map<str, str>& headers() const noexcept;
+        class internal_state final : public std::enable_shared_from_this<internal_state> {
+        public:
+            enum class status {
+                pending,
+                ready,
+                canceled,
+            };
+            internal_state() = default;
+        public:
+            mutable std::atomic<status> status_ {status::pending};
+            flat_map<str, str> headers_;
+            std::vector<u8> content_;
+            http_code status_code_;
+        };
+        using internal_state_ptr = std::shared_ptr<internal_state>;
+        using status = internal_state::status;
+    public:
+        http_response(internal_state_ptr);
+        bool cancel() const noexcept;
+        void wait() const noexcept;
+        [[nodiscard]] bool ready() const noexcept;
+        [[nodiscard]] bool canceled() const noexcept;
+        [[nodiscard]] http_code status_code() const;
+        [[nodiscard]] const std::vector<u8>& content() const;
+        [[nodiscard]] const flat_map<str, str>& headers() const;
     private:
-        flat_map<str, str> headers_;
-        std::vector<u8> content_;
-        http_code status_;
+        internal_state_ptr state_;
     };
 
     //
@@ -115,8 +153,8 @@ namespace e2d
         network(debug& d);
         ~network() noexcept;
 
-        [[nodiscard]] stdex::promise<http_response> send(http_request&&);
-        [[nodiscard]] stdex::promise<http_response> send(http_request&);
+        [[nodiscard]] http_response send(http_request&&);
+        [[nodiscard]] http_response send(http_request&);
     private:
         class internal_state;
         std::unique_ptr<internal_state> state_;

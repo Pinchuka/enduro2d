@@ -11,26 +11,14 @@ TEST_CASE("network"){
     modules::initialize<debug>();
     modules::initialize<network>(the<debug>());
     {
-        auto req1 = the<network>().send(http_request("ya.ru", http_request::method::get)
+        auto resp1 = the<network>().send(http_request("ya.ru", http_request::method::get)
                 .timeout(15.f)
                 .header("name", "value"));
-        req1.then([](const http_response& resp){
-            REQUIRE(resp.status_code() == 200);
-        });
 
-        req1.wait();
+        resp1.wait();
+        REQUIRE(resp1.ready());
+        REQUIRE(resp1.status_code() == http_code::OK);
     }
     modules::shutdown<network>();
     modules::shutdown<debug>();
-
-    /*
-    auto req = request("ya.ru")
-        .timeout(15.f)
-        .header("name", "value");
-
-    the<network>()
-        .send(req)
-        .then([](const response& resp){
-            resp.status();
-        });*/
 }

@@ -147,24 +147,49 @@ namespace e2d
     // http_response
     //
 
-    http_response::http_response(
-        http_code status,
-        flat_map<str, str>&& headers,
-        std::vector<u8>&& content)
-    : headers_(headers)
-    , content_(content)
-    , status_(status) {}
+    http_response::http_response(internal_state_ptr ptr)
+    : state_(ptr) {}
 
-    http_code http_response::status_code() const noexcept {
-        return status_;
+    http_code http_response::status_code() const {
+        if ( state_->status_.load() == status::pending )
+            throw http_response_not_ready();
+        return state_->status_code_;
     }
 
-    const std::vector<u8>& http_response::content() const noexcept {
-        return content_;
+    const std::vector<u8>& http_response::content() const {
+        if ( state_->status_.load() == status::pending )
+            throw http_response_not_ready();
+        return state_->content_;
     }
 
-    const flat_map<str, str>& http_response::headers() const noexcept {
-        return headers_;
+    const flat_map<str, str>& http_response::headers() const {
+        if ( state_->status_.load() == status::pending )
+            throw http_response_not_ready();
+        return state_->headers_;
+    }
+
+    bool http_response::cancel() const noexcept {
+        status expected = status::pending;
+        for (; !state_->status_.compare_exchange_weak(expected, status::canceled);) {
+        }
+        return expected == status::pending;
+    }
+
+    void http_response::wait() const noexcept {
+        for (int i = 0; state_->status_.load() == status::pending; ++i) {
+            if ( i > 2000 ) {
+                i = 0;
+                std::this_thread::yield();
+            }
+        }
+    }
+
+    bool http_response::ready() const noexcept {
+        return state_->status_.load() == status::ready;
+    }
+
+    bool http_response::canceled() const noexcept {
+        return state_->status_.load() == status::canceled;
     }
 }
 

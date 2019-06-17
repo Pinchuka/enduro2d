@@ -22,7 +22,7 @@ namespace e2d
         secf timeout,
         http_request::content_t &&content,
         output_stream_uptr &&stream,
-        stdex::promise<http_response> result)
+        const response_t& result)
     : timeout_(timeout)
     , content_(std::move(content))
     , debug_(debug)
@@ -69,10 +69,8 @@ namespace e2d
                 curl_easy_setopt(curl_, CURLOPT_READDATA, this);
                 curl_easy_setopt(curl_, CURLOPT_READFUNCTION, &read_data_callback);
             }
-            else if ( stdex::holds_alternative<stdex::monostate>(content_) ) {
-            }
-            else {
-                throw bad_network_operation();
+            else if ( !stdex::holds_alternative<stdex::monostate>(content_) ) {
+                throw bad_http_request();
             }
             break;
 
@@ -91,7 +89,7 @@ namespace e2d
                 curl_easy_setopt(curl_, CURLOPT_POSTFIELDS, nullptr);
             }
             else {
-                throw bad_network_operation();
+                throw bad_http_request();
             }
             break;
 
@@ -117,16 +115,6 @@ namespace e2d
 
         // TODO
         //curl_easy_setopt(curl_, CURLOPT_ACCEPT_ENCODING, "");
-
-        canceled_.store(false);
-        result_.except([this](std::exception_ptr e) {
-            canceled_.store(true);
-            std::rethrow_exception(e);
-            return http_response(
-                    http_code_,
-                    std::move(response_headers_),
-                    std::move(response_content_));
-        });
     }
 
     curl_http_request::~curl_http_request() noexcept {
@@ -155,11 +143,14 @@ namespace e2d
         if ( curl_easy_getinfo(curl_, CURLINFO_RESPONSE_CODE, &response_code) == CURLE_OK ) {
             http_code_ = http_code(response_code);
         }
-        result_.resolve(http_response(
-            http_code_,
-            std::move(response_headers_),
-            std::move(response_content_)
-        ));
+
+        result_->status_code_ = http_code_;
+
+        status expected = status::pending;
+        for (; !result_->status_.compare_exchange_weak(expected, status::ready);) {
+        }
+
+        E2D_ASSERT(expected == status::pending); // TODO: what to do if it was canceled?
     }
 
     void curl_http_request::cancel() noexcept {
@@ -174,9 +165,13 @@ namespace e2d
         return curl_;
     }
 
+    bool curl_http_request::is_canceled() const noexcept {
+        return result_->status_.load() == status::canceled;
+    }
+
     size_t curl_http_request::read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
         auto* self = static_cast<curl_http_request *>(userdata);
-        if ( self->canceled_.load() ) {
+        if ( self->is_canceled() ) {
             return CURLE_ABORTED_BY_CALLBACK;
         }
         auto& src = stdex::get<http_request::data_t>(self->content_);
@@ -192,66 +187,68 @@ namespace e2d
     }
 
     size_t curl_http_request::read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
-        auto* self = static_cast<curl_http_request *>(userdata);
-        if ( self->canceled_.load() ) {
+        try {
+            auto* self = static_cast<curl_http_request *>(userdata);
+            if ( self->is_canceled() ) {
+                return CURLE_ABORTED_BY_CALLBACK;
+            }
+            auto& src = stdex::get<input_stream_uptr>(self->content_);
+            size_t offset = self->sent_.load();
+            E2D_ASSERT(offset == src->tell());
+            size_t required = size * nitems;
+            size_t written = src->read(buffer, required);
+            self->sent_.fetch_add(written);
+            return written;
+        } catch(...) {
             return CURLE_ABORTED_BY_CALLBACK;
         }
-        auto& src = stdex::get<input_stream_uptr>(self->content_);
-        size_t offset = self->sent_.load();
-        E2D_ASSERT(offset == src->tell());
-        size_t required = size * nitems;
-        size_t written = src->read(buffer, required);
-        self->sent_.fetch_add(written);
-        return written;
     }
 
     size_t curl_http_request::header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
-        auto* self = static_cast<curl_http_request *>(userdata);
-        if ( self->canceled_.load() ) {
-            return 0;
-        }
-        self->last_response_time_ = time_point_t::clock::now();
-        size_t header_size = size * nitems;
-        if ( header_size > 0 && header_size <= CURL_MAX_HTTP_HEADER ) {
-            str header(buffer, header_size);
-            header.erase(std::remove_if(header.begin(), header.end(), [](auto c){ return c == '\n' || c == '\r'; }), header.end());
-            if ( header.size() ) {
-                size_t separator = header.find(": ");
-                if ( separator != str_view::npos ) {
-                    self->response_headers_.insert_or_assign(header.substr(0, separator), header.substr(separator+2));
-                } else {
-                    self->response_headers_.insert_or_assign(std::move(header), str());
-                }
+        try {
+            auto* self = static_cast<curl_http_request *>(userdata);
+            if ( self->is_canceled() ) {
+                return 0;
             }
-            return header_size;
+            self->last_response_time_ = time_point_t::clock::now();
+            size_t header_size = size * nitems;
+            if ( header_size > 0 && header_size <= CURL_MAX_HTTP_HEADER ) {
+                str header(buffer, header_size);
+                header.erase(std::remove_if(header.begin(), header.end(), [](auto c){ return c == '\n' || c == '\r'; }), header.end());
+                if ( header.size() ) {
+                    size_t separator = header.find(": ");
+                    if ( separator != str_view::npos ) {
+                        self->result_->headers_.insert_or_assign(header.substr(0, separator), header.substr(separator+2));
+                    } else {
+                        self->result_->headers_.insert_or_assign(std::move(header), str());
+                    }
+                }
+                return header_size;
+            }
+        } catch(...) {
         }
         return 0;
     }
 
     size_t curl_http_request::write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-        auto* self = static_cast<curl_http_request *>(userdata);
-        if ( self->canceled_.load() ) {
-            return 0;
-        }
-        self->last_response_time_ = time_point_t::clock::now();
-        size_t buffer_size = size * nmemb;
-        size_t offset = self->response_content_.size();
-        if ( buffer_size == 0 )
-            return 0;
-        if ( self->response_stream_ ) {
-            try {
+        try {
+            auto* self = static_cast<curl_http_request *>(userdata);
+            if ( self->is_canceled() ) {
+                return 0;
+            }
+            self->last_response_time_ = time_point_t::clock::now();
+            size_t buffer_size = size * nmemb;
+            size_t offset = self->result_->content_.size();
+            if ( buffer_size == 0 )
+                return 0;
+            if ( self->response_stream_ ) {
                 return self->response_stream_->write(ptr, buffer_size);
-            } catch(...) {
-                return 0;
+            } else {
+                self->result_->content_.resize(self->result_->content_.size() + buffer_size);
+                memcpy(self->result_->content_.data() + offset, ptr, buffer_size);
+                return buffer_size;
             }
-        } else {
-            try {
-                self->response_content_.resize(self->response_content_.size() + buffer_size);
-            } catch(...) {
-                return 0;
-            }
-            memcpy(self->response_content_.data() + offset, ptr, buffer_size);
-            return buffer_size;
+        } catch(...) {
         }
         return 0;
     }
@@ -286,7 +283,7 @@ namespace e2d
     }
 
     bool curl_http_request::is_complete() noexcept {
-        if ( canceled_.load() )
+        if ( is_canceled() )
             return true;
 
         if ( add_to_curlm_result_ != CURLM_OK )
@@ -323,13 +320,17 @@ namespace e2d
             using namespace std::chrono ;
             using time_point_t = high_resolution_clock::time_point;
             using nonos = std::chrono::nanoseconds;
-            constexpr nonos min_frame_time{10*1000000};
+            constexpr nonos min_frame_time = duration_cast<nonos>(std::chrono::milliseconds(10));
             while ( !exit_ ) {
-                auto begin_time = time_point_t::clock::now();
-                tick();
-                auto dt = duration_cast<nonos>(time_point_t::clock::now() - begin_time);
-                if ( dt < min_frame_time ) {
-                    std::this_thread::sleep_for(min_frame_time - dt);
+                try {
+                    auto begin_time = time_point_t::clock::now();
+                    tick();
+                    auto dt = duration_cast<nonos>(time_point_t::clock::now() - begin_time);
+                    if ( dt < min_frame_time ) {
+                        std::this_thread::sleep_for(min_frame_time - dt);
+                    }
+                } catch(...) {
+                    // TODO ?
                 }
             }
         });
