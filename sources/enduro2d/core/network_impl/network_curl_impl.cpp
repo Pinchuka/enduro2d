@@ -195,42 +195,42 @@ namespace e2d
         return result_->status_.load() == status::canceled;
     }
 
-    size_t curl_http_request::read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+    size_t curl_http_request::read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) noexcept {
         auto* self = static_cast<curl_http_request *>(userdata);
         if ( self->is_canceled() ) {
             return CURLE_ABORTED_BY_CALLBACK;
         }
         auto& src = stdex::get<http_request::data_t>(self->content_);
-        size_t offset = self->sent_.load();
+        size_t offset = self->result_->bytes_sent_.load();
         size_t required = size * nitems;
         size_t written = 0;
         if ( offset + required <= src.size() ) {
             written = math::min(src.size() - offset, required);
             memcpy(buffer, src.data() + offset, written);
-            self->sent_.fetch_add(written);
+            self->result_->bytes_sent_.fetch_add(written);
         }
         return written;
     }
 
-    size_t curl_http_request::read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+    size_t curl_http_request::read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) noexcept {
         try {
             auto* self = static_cast<curl_http_request *>(userdata);
             if ( self->is_canceled() ) {
                 return CURLE_ABORTED_BY_CALLBACK;
             }
             auto& src = stdex::get<input_stream_uptr>(self->content_);
-            size_t offset = self->sent_.load();
+            size_t offset = self->result_->bytes_sent_.load();
             E2D_ASSERT(offset == src->tell());
             size_t required = size * nitems;
             size_t written = src->read(buffer, required);
-            self->sent_.fetch_add(written);
+            self->result_->bytes_sent_.fetch_add(written);
             return written;
         } catch(...) {
             return CURLE_ABORTED_BY_CALLBACK;
         }
     }
 
-    size_t curl_http_request::header_callback(char *buffer, size_t size, size_t nitems, void *userdata) {
+    size_t curl_http_request::header_callback(char *buffer, size_t size, size_t nitems, void *userdata) noexcept {
         try {
             auto* self = static_cast<curl_http_request *>(userdata);
             if ( self->is_canceled() ) {
@@ -256,7 +256,7 @@ namespace e2d
         return 0;
     }
 
-    size_t curl_http_request::write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+    size_t curl_http_request::write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) noexcept {
         try {
             auto* self = static_cast<curl_http_request *>(userdata);
             if ( self->is_canceled() ) {
@@ -267,6 +267,7 @@ namespace e2d
             size_t offset = self->result_->content_.size();
             if ( buffer_size == 0 )
                 return 0;
+            self->result_->bytes_received_.fetch_add(buffer_size);
             if ( self->response_stream_ ) {
                 return self->response_stream_->write(ptr, buffer_size);
             } else {
@@ -283,7 +284,7 @@ namespace e2d
                                           curl_infotype type,
                                           char *data,
                                           size_t size,
-                                          void *userptr) {
+                                          void *userptr) noexcept {
         auto* self = static_cast<curl_http_request *>(userptr);
         E2D_ASSERT(self == nullptr || handle == self->curl());
         switch (type)

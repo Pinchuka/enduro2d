@@ -197,6 +197,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
 target_link_libraries(${PROJECT_NAME}
     PRIVATE bass
     PRIVATE glfw
+    PRIVATE curl z
     PRIVATE libglew_static
     PRIVATE $<$<CXX_COMPILER_ID:MSVC>:winmm.lib>)
 

@@ -4,12 +4,32 @@
  * Copyright (C) 2018-2019, by Matvey Cherevko (blackmatov@gmail.com)
  ******************************************************************************/
 
+#include <stdio.h>
 #include "_core.hpp"
 using namespace e2d;
 
 TEST_CASE("network"){
     modules::initialize<debug>();
     modules::initialize<network>(the<debug>());
+#if 1
+    {
+        auto resp1 = the<network>().send(http_request("https://github.com/azhirnov/vkTraceConverter/blob/dev/examples/doom-syncgraph.png?raw=true", http_request::method::head));
+        resp1.wait();
+        auto iter = resp1.headers().find("Content-Length");
+        REQUIRE(iter != resp1.headers().end());
+        const size_t expected_size = std::stoull(iter->second);
+
+        auto resp2 = the<network>().send(http_request("https://github.com/azhirnov/vkTraceConverter/blob/dev/examples/doom-syncgraph.png?raw=true", http_request::method::get));
+        for (size_t last = 1; resp2.in_progress();) {
+            size_t n = resp2.donwloaded().value;
+            if ( n != last ) {
+                printf("downloaded: %zu, %0.2f\n", n, (float(n)/expected_size));
+                last = n;
+            }
+        }
+        resp2.wait();
+        REQUIRE(expected_size == resp2.donwloaded().value);
+    }
     {
         auto resp1 = the<network>().send(http_request("ya.ru", http_request::method::get)
                 .timeout(15.f)
@@ -91,13 +111,15 @@ TEST_CASE("network"){
         REQUIRE(resp1.ready());
         REQUIRE(resp1.status_code() == http_code::connection_error);
     }
+#endif
 
-#if 0
+#if 1
 /*
     Server API:
-    - if header "test-number: [N]" return header "test-[N]: passed", return content "test-[N] - passed"
-    - if header "delay: [T]" wait [T] seconds and then return any data
-    - if header "redirect: [N]" redirect [N] times
+    - if header "test-number: [N]" return header "test-[N]: passed", return content "test-[N] - passed".
+    - if header "delay: [T]" wait [T] seconds and then return any data.
+    - if header "redirect: [N]" redirect [N] times.
+    - if header "test-content: [name]" then test uploaded content with reference data assosiated by [name], .
 */
     str dbg_server = "ghjokjnhbgvbhnjk";    // TODO
     SECTION("get"){
@@ -269,6 +291,31 @@ TEST_CASE("network"){
                 })
                 .wait();
         }
+        {
+            str resources;
+            REQUIRE(filesystem::extract_predef_path(
+                resources,
+                filesystem::predef_path::resources));
+            auto src = make_read_file(path::combine(resources, "bin/gnome/gnome.png"));
+            REQUIRE(src);
+
+            buffer image_data(src->length());
+            REQUIRE(src->read(image_data.data(), image_data.size()) == image_data.size());
+
+            auto resp = the<network>().send(http_request(dbg_server, http_request::method::post)
+                .header("test-content", "gnome")
+                .content(image_data));
+
+            for (size_t last = 0; resp.in_progress();) {
+                size_t n = resp.uploaded().value;
+                if ( n > last ) {
+                    printf("uploaded: %zu, %0.2f\n", n, (float(n)/image_data.size()));
+                    last = n;
+                }
+            }
+            resp.wait();
+            REQUIRE(resp.uploaded().value == image_data.size());
+        }
     }
     SECTION("header"){
         the<network>().send(http_request(dbg_server, http_request::method::head)
@@ -285,6 +332,24 @@ TEST_CASE("network"){
                 FAIL("http request was canceled");
             })
             .wait();
+        {
+            auto resp1 = the<network>().send(http_request(dbg_server + "/gnome", http_request::method::head));
+            resp1.wait();
+            auto iter = resp1.headers().find("Content-Length");
+            REQUIRE(iter != resp1.headers().end());
+            const size_t expected_size = std::stoull(iter->second);
+
+            auto resp2 = the<network>().send(http_request(dbg_server + "/gnome", http_request::method::get));
+            for (size_t last = 1; resp2.in_progress();) {
+                size_t n = resp2.donwloaded().value;
+                if ( n != last ) {
+                    printf("downloaded: %zu, %0.2f\n", n, (float(n)/expected_size));
+                    last = n;
+                }
+            }
+            resp2.wait();
+            REQUIRE(expected_size == resp2.donwloaded().value);
+        }
     }
     // TODO
     // - SSL

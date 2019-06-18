@@ -42,11 +42,11 @@ namespace e2d
         void cancel();
     private:
         [[nodiscard]] bool is_canceled() const noexcept;
-        static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata);
-        static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata);
-        static size_t header_callback(char *buffer, size_t size, size_t nitems, void *userdata);
-        static size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata);
-        static int debug_callback(CURL *handle, curl_infotype type, char *data, size_t size, void *userptr);
+        static size_t read_data_callback(char *buffer, size_t size, size_t nitems, void *userdata) noexcept;
+        static size_t read_stream_callback(char *buffer, size_t size, size_t nitems, void *userdata) noexcept;
+        static size_t header_callback(char *buffer, size_t size, size_t nitems, void *userdata) noexcept;
+        static size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) noexcept;
+        static int debug_callback(CURL *handle, curl_infotype type, char *data, size_t size, void *userptr) noexcept;
     private:
         // request
         const secf timeout_;
@@ -59,12 +59,9 @@ namespace e2d
         CURLMcode add_to_curlm_result_;
         CURLcode completion_result_;
         http_code http_code_;
-        std::atomic<int> sent_; // TODO
         // response
         using time_point_t = std::chrono::high_resolution_clock::time_point;
         time_point_t last_response_time_;
-        //flat_map<str, str> response_headers_;
-        //std::vector<u8> response_content_;
         output_stream_uptr response_stream_;
         response_t result_;
     };

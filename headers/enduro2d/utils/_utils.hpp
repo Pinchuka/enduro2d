@@ -59,6 +59,7 @@ namespace e2d
     struct seconds_tag {};
     struct milliseconds_tag {};
     struct microseconds_tag {};
+    struct bytes_tag {};
 
     template < typename T >
     using seconds = unit<T, seconds_tag>;
@@ -66,8 +67,11 @@ namespace e2d
     using milliseconds = unit<T, milliseconds_tag>;
     template < typename T >
     using microseconds = unit<T, microseconds_tag>;
+    template < typename T >
+    using bytes = unit<T, bytes_tag>;
     
     using secf = seconds<f32>;
+    using bytesu = bytes<std::size_t>;
 }
 
 namespace e2d

@@ -216,5 +216,17 @@ namespace e2d
     bool http_response::canceled() const noexcept {
         return state_->status_.load() == status::canceled;
     }
+
+    bool http_response::in_progress() const noexcept {
+        return state_->status_.load() == status::pending;
+    }
+
+    bytesu http_response::uploaded() const noexcept {
+        return bytesu(state_->bytes_sent_.load());
+    }
+
+    bytesu http_response::donwloaded() const noexcept {
+        return bytesu(state_->bytes_received_.load());
+    }
 }
 

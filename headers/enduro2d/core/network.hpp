@@ -136,6 +136,8 @@ namespace e2d
             internal_state() = default;
         public:
             mutable std::atomic<status> status_ {status::pending};
+            std::atomic<size_t> bytes_sent_ {0};
+            std::atomic<size_t> bytes_received_ {0};
             flat_map<str, str> headers_;
             std::vector<u8> content_;
             http_code status_code_ {http_code::unknown};
@@ -152,10 +154,13 @@ namespace e2d
         [[nodiscard]] promise_t& handler() noexcept;
         [[nodiscard]] bool ready() const noexcept;
         [[nodiscard]] bool canceled() const noexcept;
+        [[nodiscard]] bool in_progress() const noexcept;
         [[nodiscard]] http_code status_code() const;
         [[nodiscard]] const std::vector<u8>& content() const;
         [[nodiscard]] str_view content_as_str() const;
         [[nodiscard]] const flat_map<str, str>& headers() const;
+        [[nodiscard]] bytesu uploaded() const noexcept;
+        [[nodiscard]] bytesu donwloaded() const noexcept;
     private:
         internal_state_ptr state_;
     };
