@@ -290,6 +290,7 @@ namespace e2d
                                           void *userptr) noexcept {
         auto* self = static_cast<curl_http_request *>(userptr);
         E2D_ASSERT(self == nullptr || handle == self->curl());
+        E2D_UNUSED(data, size);
         switch (type)
         {
         case CURLINFO_TEXT :
@@ -340,19 +341,22 @@ namespace e2d
         debug& debug)
     : debug_(debug) {
         curl_version_info_data* info = curl_version_info(CURLVERSION_NOW);
-        if ( info && (info->features & CURL_VERSION_MULTI_SSL) ) {
-            const curl_ssl_backend** available = nullptr;
-            curl_global_sslset(CURLSSLBACKEND_NONE, nullptr, &available);
-            for (u32 i = 0; available && available[i]; ++i) {
-                if ( curl_global_sslset(available[i]->id, nullptr, nullptr) == CURLSSLSET_OK ) {
-                    dbg().trace("CURL supports SSL with '($0)' backend", available[i]->name);
-                    break;
+        if ( info ) {
+            dbg().trace("CURL version (%0)", info->version);
+            if ( info->features & CURL_VERSION_MULTI_SSL ) {
+                const curl_ssl_backend** available = nullptr;
+                curl_global_sslset(CURLSSLBACKEND_NONE, nullptr, &available);
+                for (u32 i = 0; available && available[i]; ++i) {
+                    if ( curl_global_sslset(available[i]->id, nullptr, nullptr) == CURLSSLSET_OK ) {
+                        dbg().trace("CURL supports SSL with '($0)' backend", available[i]->name);
+                        break;
+                    }
                 }
+            } else if ( info->features & CURL_VERSION_SSL ) {
+                dbg().trace("CURL supports SSL with '($0)' backend", info->ssl_version);
+            } else {
+                dbg().trace("CURL doesn't support SSL");
             }
-        } else if ( info && (info->features & CURL_VERSION_SSL) ) {
-            dbg().trace("CURL supports SSL with '($0)' backend", info->ssl_version);
-        } else {
-            dbg().trace("CURL doesn't support SSL");
         }
         curl_global_init(CURL_GLOBAL_ALL);
 
