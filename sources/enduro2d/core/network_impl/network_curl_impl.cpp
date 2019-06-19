@@ -339,13 +339,20 @@ namespace e2d
     network::internal_state::internal_state(
         debug& debug)
     : debug_(debug) {
-        const curl_ssl_backend** available = nullptr;
-        curl_global_sslset(CURLSSLBACKEND_NONE, nullptr, &available);
-        for (u32 i = 0; available[i]; ++i) {
-            if ( curl_global_sslset(available[i]->id, nullptr, nullptr) == CURLSSLSET_OK ) {
-                dbg().trace("used SSL backend ($0)", available[i]->name);
-                break;
+        curl_version_info_data* info = curl_version_info(CURLVERSION_NOW);
+        if ( info && (info->features & CURL_VERSION_MULTI_SSL) ) {
+            const curl_ssl_backend** available = nullptr;
+            curl_global_sslset(CURLSSLBACKEND_NONE, nullptr, &available);
+            for (u32 i = 0; available && available[i]; ++i) {
+                if ( curl_global_sslset(available[i]->id, nullptr, nullptr) == CURLSSLSET_OK ) {
+                    dbg().trace("CURL supports SSL with '($0)' backend", available[i]->name);
+                    break;
+                }
             }
+        } else if ( info && (info->features & CURL_VERSION_SSL) ) {
+            dbg().trace("CURL supports SSL with '($0)' backend", info->ssl_version);
+        } else {
+            dbg().trace("CURL doesn't support SSL");
         }
         curl_global_init(CURL_GLOBAL_ALL);
 
