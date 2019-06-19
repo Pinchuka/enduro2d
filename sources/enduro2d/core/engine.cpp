@@ -181,6 +181,11 @@ namespace e2d
         return *this;
     }
 
+    engine::parameters& engine::parameters::without_network(bool value) {
+        without_network_ = value;
+        return *this;
+    }
+
     engine::parameters& engine::parameters::debug_params(const debug_parameters& value) {
         debug_params_ = value;
         return *this;
@@ -212,6 +217,10 @@ namespace e2d
         return without_graphics_;
     }
 
+    bool& engine::parameters::without_network() noexcept {
+        return without_network_;
+    }
+
     engine::debug_parameters& engine::parameters::debug_params() noexcept {
         return debug_params_;
     }
@@ -238,6 +247,10 @@ namespace e2d
 
     const bool& engine::parameters::without_graphics() const noexcept {
         return without_graphics_;
+    }
+
+    const bool& engine::parameters::without_network() const noexcept {
+        return without_network_;
     }
 
     const engine::debug_parameters& engine::parameters::debug_params() const noexcept {
@@ -393,8 +406,10 @@ namespace e2d
 
         // setup network
 
-        safe_module_initialize<network>(
-            the<debug>());
+        if ( !params.without_network() ) {
+            safe_module_initialize<network>(
+                the<debug>());
+        }
 
         // setup audio
 

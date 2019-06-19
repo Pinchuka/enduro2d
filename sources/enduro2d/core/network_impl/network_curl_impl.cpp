@@ -37,9 +37,8 @@ namespace e2d
         curl_ = curl_easy_init();
         curl_easy_setopt(curl_, CURLOPT_DEBUGDATA, this);
         curl_easy_setopt(curl_, CURLOPT_DEBUGFUNCTION, &debug_callback);
-        curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L);
+        curl_easy_setopt(curl_, CURLOPT_VERBOSE, 1L); // for debug_callback
         curl_easy_setopt(curl_, CURLOPT_BUFFERSIZE, 64*1024);
-        curl_easy_setopt(curl_, CURLOPT_USE_SSL, CURLUSESSL_ALL);
         curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
         curl_easy_setopt(curl_, CURLOPT_PRIVATE, this);
         //curl_easy_setopt(curl_, CURLOPT_PROXY, );
@@ -54,6 +53,10 @@ namespace e2d
         }
 
         // TODO: for SSL
+        curl_easy_setopt(curl_, CURLOPT_USE_SSL, CURLUSESSL_ALL);
+        //curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYPEER, 1L);
+        //curl_easy_setopt(curl_, CURLOPT_SSL_VERIFYHOST, 0L);
+        curl_easy_setopt(curl_, CURLOPT_SSLCERTTYPE, "PEM");
         if ( true ) {
             //curl_easy_setopt(curl_, CURLOPT_CAINFO, nullptr);
             //curl_easy_setopt(curl_, CURLOPT_SSL_CTX_FUNCTION, sslctx_function);
@@ -336,6 +339,14 @@ namespace e2d
     network::internal_state::internal_state(
         debug& debug)
     : debug_(debug) {
+        const curl_ssl_backend** available = nullptr;
+        curl_global_sslset(CURLSSLBACKEND_NONE, nullptr, &available);
+        for (u32 i = 0; available[i]; ++i) {
+            if ( curl_global_sslset(available[i]->id, nullptr, nullptr) == CURLSSLSET_OK ) {
+                dbg().trace("used SSL backend ($0)", available[i]->name);
+                break;
+            }
+        }
         curl_global_init(CURL_GLOBAL_ALL);
 
         curl_ = curl_multi_init();
