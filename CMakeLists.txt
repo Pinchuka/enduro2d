@@ -114,7 +114,7 @@ add_subdirectory(modules/glew)
 set_target_properties(libglew_static PROPERTIES FOLDER modules)
 
 add_subdirectory(modules/enduro2d-external)
-include(modules/enduro2d-external/attach.cmake)
+include(modules/enduro2d-external/engine-integration.cmake)
 
 #
 # e2d library target
@@ -150,7 +150,9 @@ target_compile_options(${PROJECT_NAME}
         -Wall -Wextra -Wpedantic>
     PRIVATE
     $<$<PLATFORM_ID:Darwin>:
-        -Wno-deprecated-declarations>)
+        -Wno-deprecated-declarations>
+    PRIVATE
+        -DGLEW_NO_GLU)
 
 target_compile_features(${PROJECT_NAME}
     PUBLIC cxx_std_17)
