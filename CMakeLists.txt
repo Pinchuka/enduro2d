@@ -131,11 +131,17 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     ${E2D_3RDPARTY})
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE bass
-    PRIVATE curl
     PRIVATE glfw
     PRIVATE libglew_static
     PRIVATE $<$<CXX_COMPILER_ID:MSVC>:winmm.lib>)
+
+if(${E2D_ENABLE_BASS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE bass)
+endif()
+
+if(${E2D_ENABLE_CURL})
+    target_link_libraries(${PROJECT_NAME} PRIVATE curl)
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC headers
